@@ -2,30 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class Login : MonoBehaviour
 {
-    public InputField Id_i;
-    public InputField Password_i;
+    public InputField ipf_Id;
+    public InputField ipf_Pw;
 
-    public Text log;
+    public TextMeshProUGUI text_log;
 
     public void Login_btn()
     {
-        if (Id_i.text.Equals(string.Empty) || Password_i.text.Equals(string.Empty))
+        if (ipf_Id.text.Equals(string.Empty) || ipf_Pw.text.Equals(string.Empty))
         {
-            log.text = "아이디/비밀번호를 입력해주세요";
+            text_log.text = "아이디/비밀번호를 입력해주세요";
             return;
         }
 
-       /* if (DBManager.instance.Login(Id_i.text, Password_i.text))
+        if (DBManager.instance.Login(ipf_Id.text, ipf_Pw.text))
         {
+            Debug.Log($"로그인 성공");
             transform.gameObject.SetActive(false);
-            FindObjectOfType<PunManager>().Connect();
+            //FindObjectOfType<PunManager>().Connect();
         }
         else
         {
-            log.text = "아이디 비밀번호를 확인해주세요";
-        }*/
+            text_log.transform.parent.parent.gameObject.SetActive(true);
+            text_log.text = "아이디 비밀번호를 확인해주세요";
+        }
     }
 }

@@ -45,7 +45,6 @@ public class LoginUI : MonoBehaviour
         {
             // 엔터, 스페이스 바 -> 로그인
             btn_Login.onClick.Invoke();
-            Debug.Log("Button pressed!");
         }
     }
 }
