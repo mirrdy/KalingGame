@@ -10,8 +10,6 @@ public class LoginUI : MonoBehaviour
     public Selectable ipf_First_ID;
     public Button btn_Login;
 
-
-
     void Start()
     {
         system = EventSystem.current;
