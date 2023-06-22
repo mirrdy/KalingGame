@@ -10,6 +10,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public static NetworkManager instance = null;
 
 	string networkState;
+
+	public delegate void OnUpdateRoomProperty();
+	public OnUpdateRoomProperty onUpdateRoomProperty;
 	public string BackupRoomName
 	{
 		get => PlayerPrefs.GetString("BackupRoomName", "");
@@ -63,6 +66,17 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public override void OnJoinedRoom()
 	{
 		BackupRoomName = PhotonNetwork.CurrentRoom.Name;
+
+		// 커스텀 프로퍼티
+		Room room = PhotonNetwork.CurrentRoom;
+		ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable
+		{
+			// Add custom properties as needed
+			{"selection_Boss1", 0 },
+			{"selection_Boss2", 0 },
+			{"selection_Boss3", 0 }
+		};
+		room.SetCustomProperties(customProperties);
 		//PhotonNetwork.Instantiate("Cube", Vector2.zero, Quaternion.identity);
 	}
 
@@ -79,5 +93,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public void OnApplicationQuit()
 	{
 		BackupRoomName = "";
+	}
+	public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
+	{
+		onUpdateRoomProperty.Invoke();
 	}
 }

@@ -720,7 +720,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 397293917}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1303639714}
+        m_TargetAssemblyTypeName: SelectBossButton, Assembly-CSharp
+        m_MethodName: SelectBoss
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &397293917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1040,14 +1052,14 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2040319817}
-        m_TargetAssemblyTypeName: LobbyLogManager, Assembly-CSharp
-        m_MethodName: AddLog
-        m_Mode: 5
+      - m_Target: {fileID: 1303639714}
+        m_TargetAssemblyTypeName: SelectBossButton, Assembly-CSharp
+        m_MethodName: SelectBoss
+        m_Mode: 3
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: "\uBC84\uD2BC\uD074\uB9AD"
           m_BoolArgument: 0
@@ -1365,10 +1377,10 @@ RectTransform:
   m_Father: {fileID: 566895725}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -273.71}
-  m_SizeDelta: {x: 0, y: -547.42}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 266.29}
+  m_SizeDelta: {x: 356, y: 532.58}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &821917803
 MonoBehaviour:
@@ -1928,6 +1940,7 @@ GameObject:
   - component: {fileID: 1303639712}
   - component: {fileID: 1303639711}
   - component: {fileID: 1303639710}
+  - component: {fileID: 1303639714}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -2019,6 +2032,18 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &1303639714
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1303639709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b0dcf8a32c9ac0042a37cb90038bf787, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1421928560
 GameObject:
   m_ObjectHideFlags: 0
@@ -2055,36 +2080,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: -20, y: -20}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &1581896539
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1581896540}
-  m_Layer: 0
-  m_Name: LobbyNetworkManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1581896540
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1581896539}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1034.8119, y: 579.1085, z: -44.84428}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 6
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1594261917
 GameObject:
   m_ObjectHideFlags: 0
@@ -2217,7 +2212,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Boss1
+  m_text: Boss3
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
   m_sharedMaterial: {fileID: 2288208782101273992, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
@@ -2370,10 +2365,10 @@ RectTransform:
   m_Father: {fileID: 566895725}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 1, y: 1}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: -273.70807}
-  m_SizeDelta: {x: 0, y: 547.4161}
+  m_SizeDelta: {x: 356, y: 547.4161}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1665953266
 MonoBehaviour:
@@ -2574,7 +2569,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1907306100}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1303639714}
+        m_TargetAssemblyTypeName: SelectBossButton, Assembly-CSharp
+        m_MethodName: SelectBoss
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1907306100
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2804,7 +2811,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Boss1
+  m_text: Boss2
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
   m_sharedMaterial: {fileID: 2288208782101273992, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
@@ -2926,6 +2933,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scrollRect: {fileID: 575666387}
   text_Log: {fileID: 654599250}
+  text_PlayerCount: {fileID: 1942527824}
+  text_Count_Boss1: {fileID: 1289847645}
+  text_Count_Boss2: {fileID: 296497829}
+  text_Count_Boss3: {fileID: 66851752}
 --- !u!1 &2058609463
 GameObject:
   m_ObjectHideFlags: 0
