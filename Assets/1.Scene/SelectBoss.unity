@@ -259,7 +259,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC120\uD0DD \uC778\uC6D0: 0\uBA85"
+  m_text: "\uC120\uD0DD \uC778\uC6D0: 0"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
   m_sharedMaterial: {fileID: 2288208782101273992, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
@@ -471,7 +471,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC120\uD0DD \uC778\uC6D0: 0\uBA85"
+  m_text: "\uC120\uD0DD \uC778\uC6D0: 0"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
   m_sharedMaterial: {fileID: 2288208782101273992, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
@@ -1061,7 +1061,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 1
           m_FloatArgument: 0
-          m_StringArgument: "\uBC84\uD2BC\uD074\uB9AD"
+          m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &594991929
@@ -1851,7 +1851,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uC120\uD0DD \uC778\uC6D0: 0\uBA85"
+  m_text: "\uC120\uD0DD \uC778\uC6D0: 0"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
   m_sharedMaterial: {fileID: 2288208782101273992, guid: 1cecc80e906f6834ea50e3d6b0f0b019, type: 2}
@@ -2044,6 +2044,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0dcf8a32c9ac0042a37cb90038bf787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  btn_Selection:
+  - {fileID: 594991928}
+  - {fileID: 1907306099}
+  - {fileID: 397293916}
 --- !u!1 &1421928560
 GameObject:
   m_ObjectHideFlags: 0
@@ -2899,7 +2903,7 @@ GameObject:
   - component: {fileID: 2040319816}
   - component: {fileID: 2040319817}
   m_Layer: 0
-  m_Name: LobbyLogManager
+  m_Name: LobbyUIManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2934,9 +2938,10 @@ MonoBehaviour:
   scrollRect: {fileID: 575666387}
   text_Log: {fileID: 654599250}
   text_PlayerCount: {fileID: 1942527824}
-  text_Count_Boss1: {fileID: 1289847645}
-  text_Count_Boss2: {fileID: 296497829}
-  text_Count_Boss3: {fileID: 66851752}
+  text_BossSelCounts:
+  - {fileID: 1289847645}
+  - {fileID: 296497829}
+  - {fileID: 66851752}
 --- !u!1 &2058609463
 GameObject:
   m_ObjectHideFlags: 0

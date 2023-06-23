@@ -7,12 +7,15 @@ using UnityEngine.SceneManagement;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+	public int playerID = -1;
 	public static NetworkManager instance = null;
-
 	string networkState;
 
+	public delegate void OnJoinedRoomDele();
+	public OnJoinedRoomDele onJoinedRoomDele;
 	public delegate void OnUpdateRoomProperty();
 	public OnUpdateRoomProperty onUpdateRoomProperty;
+
 	public string BackupRoomName
 	{
 		get => PlayerPrefs.GetString("BackupRoomName", "");
@@ -43,7 +46,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		if (networkState != curNetworkState)
 		{
 			networkState = curNetworkState;
-			print(networkState);
 		}
 	}
 
@@ -60,24 +62,35 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			PhotonNetwork.JoinOrCreateRoom("room", new RoomOptions { MaxPlayers = 3, EmptyRoomTtl = 10000 }, null);
 		}
 		else
+		{
 			PhotonNetwork.JoinRoom(BackupRoomName);
+		}
 	}
+    public override void OnCreatedRoom()
+    {
+        base.OnCreatedRoom();
 
-	public override void OnJoinedRoom()
+		// 커스텀 프로퍼티 - Room을 Create를 해도 OnCreateRoom 이벤트보다 OnJoinedRoom이 먼저 실행되는 현상 발생
+		InitCustomProperty();
+	}
+    public override void OnJoinedRoom()
 	{
 		BackupRoomName = PhotonNetwork.CurrentRoom.Name;
 
-		// 커스텀 프로퍼티
-		Room room = PhotonNetwork.CurrentRoom;
-		ExitGames.Client.Photon.Hashtable customProperties = new ExitGames.Client.Photon.Hashtable
+		int actorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+		Player[] sortedPlayers = PhotonNetwork.PlayerList;
+
+		for (int i = 0; i < sortedPlayers.Length; i++)
 		{
-			// Add custom properties as needed
-			{"selection_Boss1", 0 },
-			{"selection_Boss2", 0 },
-			{"selection_Boss3", 0 }
-		};
-		room.SetCustomProperties(customProperties);
-		//PhotonNetwork.Instantiate("Cube", Vector2.zero, Quaternion.identity);
+			if (sortedPlayers[i].ActorNumber == actorNumber)
+			{
+				playerID = i;
+				break;
+			}
+		}
+
+		InitCustomProperty();
+		onJoinedRoomDele?.Invoke();
 	}
 
 	public override void OnDisconnected(DisconnectCause cause) 
@@ -97,5 +110,21 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
 	{
 		onUpdateRoomProperty.Invoke();
+	}
+	private void InitCustomProperty()
+    {
+		Room room = PhotonNetwork.CurrentRoom;
+		if (room.CustomProperties.Count <= 0)
+		{
+			ExitGames.Client.Photon.Hashtable customProperties =
+				new ExitGames.Client.Photon.Hashtable
+				{
+					// Add custom properties as needed
+					{"selection_Boss1", 0 },
+					{"selection_Boss2", 0 },
+					{"selection_Boss3", 0 },
+				};
+			room.SetCustomProperties(customProperties);
+		}
 	}
 }
