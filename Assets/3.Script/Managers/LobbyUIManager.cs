@@ -45,12 +45,14 @@ public class LobbyUIManager : MonoBehaviour
         {
             text_PlayerCount.text = $"입장인원: ({room.PlayerCount} / {room.MaxPlayers})";
 
-            ExitGames.Client.Photon.Hashtable customProperties = room.CustomProperties;
-
             // 보스 선택 인원 표시
             for (int i = 0; i < text_BossSelCounts.Length; i++)
             {
-                int bossSelCount = (int)customProperties[$"selection_Boss{i + 1}"];
+                int bossSelCount = NetworkManager.instance.GetBossSelectionCount(i+1);
+                if (bossSelCount < 0)
+                {
+                    bossSelCount = 0;
+                }
                 text_BossSelCounts[i].text = $"선택 인원: {bossSelCount}";
             }
         }

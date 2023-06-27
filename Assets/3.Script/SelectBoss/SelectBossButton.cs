@@ -21,52 +21,27 @@ public class SelectBossButton : MonoBehaviour
         {
             return;
         }
-
-        ExitGames.Client.Photon.Hashtable customProperties = room.CustomProperties;
-        ExitGames.Client.Photon.Hashtable property;
-        string propertyStr;
-        int selectionBossCount;
+        
+        Text text = btn_Selection[selectionNum - 1].GetComponentInChildren<Text>();
 
         // 이전 선택했던 다른 버튼 취소처리
         int preSelNum = System.Array.FindIndex(isSelected, (sel) => sel);
-        if (preSelNum >= 0 && preSelNum != selectionNum-1)
+        if (preSelNum >= 0 && preSelNum != selectionNum - 1)
         {
-            propertyStr = $"selection_Boss{preSelNum + 1}";
-            selectionBossCount = (int)customProperties[propertyStr];
-
-            property = new ExitGames.Client.Photon.Hashtable
-            {
-                { propertyStr, selectionBossCount-1 }
-            };
-            room.SetCustomProperties(property);
-
             btn_Selection[preSelNum].GetComponentInChildren<Text>().text = "선택";
             isSelected[preSelNum] = false;
         }
 
-        
-        Text text = btn_Selection[selectionNum - 1].GetComponentInChildren<Text>();
-        int countNum;
         if (isSelected[selectionNum-1])
         {
-            countNum = -1;
             text.text = "선택";
+            NetworkManager.instance.UpdatePlayerSelectionData(DBManager.instance.info.id, -1);
         }
         else
         {
-            countNum = 1;
             text.text = "선택 취소";
+            NetworkManager.instance.UpdatePlayerSelectionData(DBManager.instance.info.id, selectionNum);
         }
-
-        propertyStr = $"selection_Boss{selectionNum}";
-        selectionBossCount = (int)customProperties[propertyStr];
-
-        property = new ExitGames.Client.Photon.Hashtable
-            {
-                { propertyStr, selectionBossCount+countNum }
-            };
-
-        room.SetCustomProperties(property);
 
         isSelected[selectionNum-1] = !isSelected[selectionNum-1];
     }

@@ -32,7 +32,7 @@ public class DBManager : MonoBehaviour
     MySqlDataReader reader;
     private string serverConnInfo;
 
-    UserInfo info;
+    public UserInfo info;
 
     private void Awake()
     {
