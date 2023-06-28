@@ -30,6 +30,9 @@ public class LobbyUIManager : MonoBehaviour
         // 클라이언트 접속마다 대리자에 중복해서 추가되지 않도록 하나씩만 할당
         NetworkManager.instance.onJoinedRoomDele = DisplayRoomInfo;
         NetworkManager.instance.onUpdateRoomProperty = DisplayRoomInfo;
+
+        // LobbyUIManager가 awake 하기 전에 이미 RoomJoin 이벤트가 발생했음 - 클라이언트에서 씬 전환 후 한번씩은 수동 UI 업데이트
+        DisplayRoomInfo();
     }
     
     public void AddLog(string logMessage)
