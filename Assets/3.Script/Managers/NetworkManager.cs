@@ -269,6 +269,24 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		}
         return count;
     }
+	public bool TryGetSelectedBoss(string id, out int selectedBossNum)
+    {
+		bool isSuccess = false;
+		selectedBossNum = -1;
+
+		Room room = PhotonNetwork.CurrentRoom;
+		if (!(room.CustomProperties[prop_PlayerSelectionData] is Dictionary<string, int> dict_SelNum))
+		{
+			return false;
+		}
+
+		if(dict_SelNum.TryGetValue(id, out selectedBossNum))
+        {
+			isSuccess = true;
+        }
+
+		return isSuccess;
+    }
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
         // 룸 리스트 콜백은 로비에 접속했을때 자동으로 호출된다.

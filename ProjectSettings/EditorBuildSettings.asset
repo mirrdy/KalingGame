@@ -11,4 +11,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/1.Scene/SelectBoss.unity
     guid: 337d0f43810369f469f3cb7c1ec3c985
+  - enabled: 1
+    path: Assets/1.Scene/Phase1Boss1.unity
+    guid: 1f4b8f821702d7f4bbb5987cb752262b
+  - enabled: 1
+    path: Assets/1.Scene/Phase1Boss2.unity
+    guid: b4cd0ceffcf4cd548a428e29e39061b6
+  - enabled: 1
+    path: Assets/1.Scene/Phase1Boss3.unity
+    guid: 8f64a327ae104494bb92949b167b5a76
   m_configObjects: {}

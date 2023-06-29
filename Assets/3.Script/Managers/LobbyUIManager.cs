@@ -5,12 +5,12 @@ using UnityEngine.UI;
 using TMPro;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 public class LobbyUIManager : MonoBehaviour
 {
     public static LobbyUIManager instance;
-    public ScrollRect scrollRect;
-    public TextMeshProUGUI text_Log;
+    [SerializeField] private TextMeshProUGUI text_PlayerID;
     public TextMeshProUGUI text_PlayerCount;
     [SerializeField] private TextMeshProUGUI[] text_BossSelCounts;
     
@@ -26,23 +26,18 @@ public class LobbyUIManager : MonoBehaviour
             return;
         }
 
-        text_Log.text = string.Empty;
         // 클라이언트 접속마다 대리자에 중복해서 추가되지 않도록 하나씩만 할당
         NetworkManager.instance.onJoinedRoomDele = DisplayRoomInfo;
         NetworkManager.instance.onUpdateRoomProperty = DisplayRoomInfo;
 
         // LobbyUIManager가 awake 하기 전에 이미 RoomJoin 이벤트가 발생했음 - 클라이언트에서 씬 전환 후 한번씩은 수동 UI 업데이트
         DisplayRoomInfo();
-    }
-    
-    public void AddLog(string logMessage)
-    {
-        text_Log.text += logMessage + "\n";
-        scrollRect.normalizedPosition = new Vector2(0, 0);
+        DisplayPlayerID();
     }
 
     private void DisplayRoomInfo()
     {
+        bool isReadyForStart = true;
         Room room = PhotonNetwork.CurrentRoom;
         if (room != null)
         {
@@ -52,12 +47,26 @@ public class LobbyUIManager : MonoBehaviour
             for (int i = 0; i < text_BossSelCounts.Length; i++)
             {
                 int bossSelCount = NetworkManager.instance.GetBossSelectionCount(i+1);
-                if (bossSelCount < 0)
+                if (bossSelCount <= 0)
                 {
                     bossSelCount = 0;
+                    isReadyForStart = false;
                 }
                 text_BossSelCounts[i].text = $"선택 인원: {bossSelCount}";
             }
         }
+
+        if(isReadyForStart)
+        {
+            if(NetworkManager.instance.TryGetSelectedBoss(DBManager.instance.info.id, out int selectedBossNum))
+            {
+                SceneManager.LoadScene($"Phase1Boss{selectedBossNum}");
+            }
+        }
+        
+    }
+    private void DisplayPlayerID()
+    {
+        text_PlayerID.text = DBManager.instance.info.id;
     }
 }
