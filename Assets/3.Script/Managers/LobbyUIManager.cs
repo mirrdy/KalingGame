@@ -58,10 +58,7 @@ public class LobbyUIManager : MonoBehaviour
 
         if(isReadyForStart)
         {
-            if(NetworkManager.instance.TryGetSelectedBoss(DBManager.instance.info.id, out int selectedBossNum))
-            {
-                SceneManager.LoadScene($"Phase1Boss{selectedBossNum}");
-            }
+            NetworkManager.instance.StartBossGame();
         }
         
     }

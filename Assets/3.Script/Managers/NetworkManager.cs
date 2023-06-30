@@ -8,6 +8,8 @@ using System.Linq;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+	public List<GameObject> Prefabs;
+
 	private int playerCount = 0;
 	public int playerID = -1;
 	public static NetworkManager instance = null;
@@ -18,11 +20,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public delegate void OnUpdateRoomProperty();
 	public OnUpdateRoomProperty onUpdateRoomProperty;
 
+	private Dictionary<string, RoomInfo> cachedRoomList = new Dictionary<string, RoomInfo>();
 	private List<RoomInfo> list_Room = new List<RoomInfo>();
 	private int roomNum = 0;
 	// Custom Property Name
 	public readonly string prop_PlayerID = "player_ID";
 	public readonly string prop_PlayerSelectionData = "player_SelectionData";
+	public readonly string prop_CanJoin = "canJoin";
+	public readonly string prop_MasterClientID = "masterClientID";
 
     private void Awake()
     {
@@ -37,8 +42,18 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			return;
 		}
 	}
-    void Start()
+
+	void Start()
 	{
+		DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
+		if (pool != null && this.Prefabs != null)
+		{
+			foreach (GameObject prefab in this.Prefabs)
+			{
+				pool.ResourceCache.Add(prefab.name, prefab);
+			}
+		}
+
 		PhotonNetwork.ConnectUsingSettings();
 	}
 
@@ -95,15 +110,39 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
     }
 
-    public override void OnConnectedToMaster()
+	private void UpdateCachedRoomList(List<RoomInfo> roomList)
+	{
+		for (int i = 0; i < roomList.Count; i++)
+		{
+			RoomInfo info = roomList[i];
+			if (info.RemovedFromList)
+			{
+				cachedRoomList.Remove(info.Name);
+			}
+			else
+			{
+				cachedRoomList[info.Name] = info;
+			}
+		}
+	}
+	public override void OnConnectedToMaster()
 	{
 		PhotonNetwork.JoinLobby();
+	}
+	public override void OnLeftLobby()
+	{
+		cachedRoomList.Clear();
+	}
+
+	public override void OnDisconnected(DisconnectCause cause)
+	{
+		cachedRoomList.Clear();
 	}
 
 	public override void OnJoinedLobby()
 	{
-
-    }
+		cachedRoomList.Clear();
+	}
     public void JoinRoom()
     {
         // 방을 만들 때 옵션 설정
@@ -121,13 +160,28 @@ public class NetworkManager : MonoBehaviourPunCallbacks
                 {
 					// 커스텀 프로퍼티 만들기
 					{prop_PlayerID, new Dictionary<int, string>()},
-					{prop_PlayerSelectionData, new Dictionary<string, int>()}
+					{prop_PlayerSelectionData, new Dictionary<string, int>()},
+					{prop_CanJoin, true }
                 };
 
 		roomOptions.CustomRoomProperties = customProperties;
 		roomOptions.CustomRoomPropertiesForLobby = new string[] { prop_PlayerID, prop_PlayerSelectionData };
 
-		PhotonNetwork.JoinOrCreateRoom($"room{roomNum}", roomOptions, null);
+		string roomName = string.Empty;
+		foreach(var pair in cachedRoomList)
+        {
+			if((bool)(pair.Value.CustomProperties[prop_CanJoin]))
+            {
+				roomName = pair.Key;
+				break;
+            }
+        }
+
+		if (roomName.Equals(string.Empty))
+		{
+			roomName = $"room{roomNum}";
+		}
+		PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, null);
 	}
 
     public override void OnJoinRoomFailed(short returnCode, string message)
@@ -177,11 +231,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         base.OnPlayerEnteredRoom(newPlayer);
 		onJoinedRoomDele?.Invoke();
 	}
-
-	public override void OnDisconnected(DisconnectCause cause) 
-	{
-        PhotonNetwork.Reconnect();
-    }
     
 	// Quit 콜백 내부에서 room 프로퍼티를 변경하고 네트워크에 동기화되기 전에
 	// 프로그램이 종료되어서 프로퍼티가 적용 안되는 것 같음
@@ -287,10 +336,70 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 		return isSuccess;
     }
-    public override void OnRoomListUpdate(List<RoomInfo> roomList)
+	public override void OnRoomListUpdate(List<RoomInfo> roomList)
+	{
+		UpdateCachedRoomList(roomList);
+	}
+	public void SetUnableJoinRoom()
     {
-        // 룸 리스트 콜백은 로비에 접속했을때 자동으로 호출된다.
-        // 로비에서만 호출 가능
-        list_Room = roomList;
+		Room room = PhotonNetwork.CurrentRoom;
+
+		ExitGames.Client.Photon.Hashtable customProperties =
+				new ExitGames.Client.Photon.Hashtable
+				{
+					{prop_CanJoin, false}
+				};
+
+		room.SetCustomProperties(customProperties);
+	}
+
+	public void StartBossGame()
+    {
+		if (TryGetSelectedBoss(DBManager.instance.info.id, out int selectedBossNum))
+		{
+			SetUnableJoinRoom();
+			SceneManager.LoadScene($"Phase1Boss{selectedBossNum}");
+		}
+	}
+
+    private void SelectMasterClient()
+    {
+		Room room = PhotonNetwork.CurrentRoom;
+
+		if (!(room.CustomProperties[prop_PlayerID] is Dictionary<int, string> dict_ID) ||
+			!(room.CustomProperties[prop_PlayerSelectionData] is Dictionary<string, int> dict_SelNum))
+		{
+			return;
+		}
+
+        List<List<string>> list_BossSel = new List<List<string>> { new List<string>(), new List<string>(), new List<string>() };
+
+        foreach (var id in dict_ID.Values)
+        {
+			// list_BossSel의 n-1번째 인덱스에 보스n을 선택한 유저의 닉네임을 추가함
+			list_BossSel[dict_SelNum[id] - 1].Add(id);
+        }
+		System.Random random = new System.Random();
+
+		List<string> list_MasterID = new List<string>();
+
+		for(int i=0; i<list_BossSel.Count; i++)
+        {
+			int randomIndex = random.Next(list_BossSel[i].Count);
+			if (randomIndex < 0)
+			{
+				continue;
+            }
+            list_MasterID.Add(list_BossSel[i][randomIndex]);
+        }
+
+
+        ExitGames.Client.Photon.Hashtable customProperties =
+				new ExitGames.Client.Photon.Hashtable
+				{
+					{prop_MasterClientID, list_MasterID}
+				};
+
+		room.SetCustomProperties(customProperties);
     }
 }
