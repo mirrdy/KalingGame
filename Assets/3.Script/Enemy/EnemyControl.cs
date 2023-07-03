@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,5 +21,12 @@ public class EnemyControl : MonoBehaviour
     void Update()
     {
         
+    }
+
+    [PunRPC]
+    public void TakeHitRPC(float damage)
+    {
+        //Health -= damage;
+        GetComponent<Animator>().SetTrigger("Hit");
     }
 }

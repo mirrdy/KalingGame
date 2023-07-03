@@ -505,6 +505,7 @@ GameObject:
   - component: {fileID: 271243770}
   - component: {fileID: 271243769}
   - component: {fileID: 271243768}
+  - component: {fileID: 271243771}
   m_Layer: 5
   m_Name: btn_Start
   m_TagString: Untagged
@@ -575,7 +576,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 271243769}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 271243771}
+        m_TargetAssemblyTypeName: StartBossButton, Assembly-CSharp
+        m_MethodName: StartBoss
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &271243769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -614,6 +627,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 271243766}
   m_CullTransparentMesh: 1
+--- !u!114 &271243771
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 271243766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44d7da604bdc4b44f9dc4e7ec4a08fd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &296497827
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,6 +5,7 @@ using UnityEngine;
 using Photon.Realtime;
 using UnityEngine.SceneManagement;
 using System.Linq;
+using System.Threading.Tasks;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -28,8 +29,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public readonly string prop_PlayerSelectionData = "player_SelectionData";
 	public readonly string prop_CanJoin = "canJoin";
 	public readonly string prop_MasterClientID = "masterClientID";
+	private readonly string MethodExecutedKey = "MethodExecuted";
 
-    private void Awake()
+	private void Awake()
     {
 		if (instance == null)
 		{
@@ -45,16 +47,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 	void Start()
 	{
-		DefaultPool pool = PhotonNetwork.PrefabPool as DefaultPool;
-		if (pool != null && this.Prefabs != null)
-		{
-			foreach (GameObject prefab in this.Prefabs)
-			{
-				pool.ResourceCache.Add(prefab.name, prefab);
-			}
-		}
+        if (PhotonNetwork.PrefabPool is DefaultPool pool && this.Prefabs != null)
+        {
+            foreach (GameObject prefab in this.Prefabs)
+            {
+                pool.ResourceCache.Add(prefab.name, prefab);
+            }
+        }
 
-		PhotonNetwork.ConnectUsingSettings();
+        PhotonNetwork.ConnectUsingSettings();
 	}
 
     void Update()
@@ -161,11 +162,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 					// 커스텀 프로퍼티 만들기
 					{prop_PlayerID, new Dictionary<int, string>()},
 					{prop_PlayerSelectionData, new Dictionary<string, int>()},
-					{prop_CanJoin, true }
+					{prop_MasterClientID, new Dictionary<int, string>() },
+					{prop_CanJoin, true },
                 };
 
 		roomOptions.CustomRoomProperties = customProperties;
-		roomOptions.CustomRoomPropertiesForLobby = new string[] { prop_PlayerID, prop_PlayerSelectionData };
+
+		// 로비에서 볼 수 있는 룸 프로퍼티 설정
+		roomOptions.CustomRoomPropertiesForLobby = new string[] { prop_PlayerID, prop_PlayerSelectionData, prop_MasterClientID, prop_CanJoin};
 
 		string roomName = string.Empty;
 		foreach(var pair in cachedRoomList)
@@ -257,8 +261,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	}
 	private void InitCustomProperty()
     {
-		
-		
+			
 	}
 	public void UpdatePlayerSelectionData(string id, int sel)
     {
@@ -353,11 +356,28 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		room.SetCustomProperties(customProperties);
 	}
 
-	public void StartBossGame()
+	public async void StartBossGame()
     {
 		if (TryGetSelectedBoss(DBManager.instance.info.id, out int selectedBossNum))
 		{
 			SetUnableJoinRoom();
+			SelectMasterClient();
+			// 마스터 클라이언트 프로퍼티 업데이트 될 때까지 대기 - UI 안멈추게 태스크 만들어서 대기
+			await Task.Run(() =>
+			{
+				Room room = PhotonNetwork.CurrentRoom;
+				while (true)
+				{
+					if (!(room.CustomProperties[prop_MasterClientID] is Dictionary<int, string> dict_MasterID))
+					{
+						continue;
+					}
+					if(dict_MasterID.Count > 0)
+                    {
+						break;
+                    }
+				}
+			});
 			SceneManager.LoadScene($"Phase1Boss{selectedBossNum}");
 		}
 	}
@@ -369,8 +389,22 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		if (!(room.CustomProperties[prop_PlayerID] is Dictionary<int, string> dict_ID) ||
 			!(room.CustomProperties[prop_PlayerSelectionData] is Dictionary<string, int> dict_SelNum))
 		{
+			Debug.Log("SelectMasterClient - CurrentRoom's CustomProperty is null");
 			return;
 		}
+
+		if (!IsMethodExecuted())
+		{
+            // Execute the method
+
+            // Set the "MethodExecuted" property to true atomically
+            ExitGames.Client.Photon.Hashtable properties = new ExitGames.Client.Photon.Hashtable
+            {
+                { MethodExecutedKey, true }
+            };
+            PhotonNetwork.CurrentRoom.SetCustomProperties(properties);
+		}
+		
 
         List<List<string>> list_BossSel = new List<List<string>> { new List<string>(), new List<string>(), new List<string>() };
 
@@ -381,25 +415,46 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         }
 		System.Random random = new System.Random();
 
-		List<string> list_MasterID = new List<string>();
+		Dictionary<int, string> dict_Master = new Dictionary<int, string>();
 
 		for(int i=0; i<list_BossSel.Count; i++)
         {
-			int randomIndex = random.Next(list_BossSel[i].Count);
-			if (randomIndex < 0)
-			{
+			if(list_BossSel[i].Count <= 0)
+            {
 				continue;
             }
-            list_MasterID.Add(list_BossSel[i][randomIndex]);
+			int randomIndex = random.Next(list_BossSel[i].Count);
+
+			dict_Master.Add((i+1), list_BossSel[i][randomIndex]);
         }
 
-
-        ExitGames.Client.Photon.Hashtable customProperties =
+		ExitGames.Client.Photon.Hashtable customProperties =
 				new ExitGames.Client.Photon.Hashtable
 				{
-					{prop_MasterClientID, list_MasterID}
+					{prop_MasterClientID, dict_Master}
 				};
 
 		room.SetCustomProperties(customProperties);
-    }
+	}
+	public string GetMasterClient(int bossNum)
+    {
+		Room room = PhotonNetwork.CurrentRoom;
+
+		if (!(room.CustomProperties[prop_MasterClientID] is Dictionary<int, string> dict_MasterID))
+		{
+			Debug.Log("GetMasterClient - CurrentRoom's CustomProperty is null");
+			return string.Empty;
+		}
+
+		return dict_MasterID[bossNum];
+	}
+
+	private bool IsMethodExecuted()
+	{
+		if (PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue(MethodExecutedKey, out object methodExecutedObj))
+		{
+			return (bool)methodExecutedObj;
+		}
+		return false;
+	}
 }

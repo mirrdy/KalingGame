@@ -1,27 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class StartBossButton : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
     public void StartBoss()
     {
-        if (NetworkManager.instance.TryGetSelectedBoss(DBManager.instance.info.id, out int selectedBossNum))
-        {
-            NetworkManager.instance.SetUnableJoinRoom();
-            SceneManager.LoadScene($"Phase1Boss{selectedBossNum}");
-        }
+        NetworkManager.instance.StartBossGame();
     }
 }
