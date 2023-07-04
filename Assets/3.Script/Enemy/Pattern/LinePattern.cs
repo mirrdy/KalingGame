@@ -19,15 +19,15 @@ public class LinePattern : MonoBehaviour
             flowers[i].transform.SetParent(transform);
             flowers[i].SetActive(false);
         }
-        createLine_Co = StartLinePattern_Co();
     }
     private void OnEnable()
     {
+        createLine_Co = StartLinePattern_Co();
         StartCoroutine(createLine_Co);
     }
     private void OnDisable()
     {
-        
+        StopCoroutine(createLine_Co);
     }
 
     IEnumerator StartLinePattern_Co()
@@ -44,7 +44,9 @@ public class LinePattern : MonoBehaviour
             flowers[i].SetActive(true);
             yield return waitSec;
         }
-        //yield return new WaitForSeconds(2.5f);
-        //System.Array.ForEach(flowers, (flower) => flower.SetActive(false));
+        //yield return new WaitUntil(() => System.Array.TrueForAll(flowers, (flower) => !flower.activeSelf));
+        int lastOffIndex = 0;
+        yield return new WaitUntil(() => flowers[lastOffIndex].activeSelf == false);
+        gameObject.SetActive(false);
     }
 }

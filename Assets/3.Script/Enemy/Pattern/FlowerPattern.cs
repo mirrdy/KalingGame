@@ -6,14 +6,13 @@ public class FlowerPattern : MonoBehaviour
 {
     [SerializeField]private ParticleSystem ps_Explode;
     private ParticleSystem ps;
-    private BoxCollider boxCollider;
+    private BoxCollider boxTrigger;
     
     private void Awake()
     {
         ps = Instantiate(ps_Explode, transform.position, Quaternion.identity);
         ps.transform.SetParent(transform);
-        TryGetComponent(out boxCollider);
-        boxCollider.enabled = false;
+        TryGetComponent(out boxTrigger);
     }
     private void OnEnable()
     {
@@ -21,6 +20,10 @@ public class FlowerPattern : MonoBehaviour
     }
     IEnumerator Initiate_Co()
     {
+        if (TryGetComponent(out MeshRenderer renderer))
+        {
+            renderer.enabled = true;
+        }
         float scaleUpDelay = 0.1f;
         WaitForSeconds waitSec = new WaitForSeconds(scaleUpDelay);
         int scaleUpCount = (int)(0.8f / scaleUpDelay);
@@ -45,7 +48,9 @@ public class FlowerPattern : MonoBehaviour
         }
         
         ps.Play();
-        boxCollider.enabled = true;
+        boxTrigger.enabled = true;
+        yield return null;
+        boxTrigger.enabled = false;
         yield return new WaitUntil(() => ps.isPlaying);
         yield return new WaitUntil(() => ps.isStopped);
         gameObject.SetActive(false);

@@ -17,7 +17,7 @@ public class LineSpawner : MonoBehaviour
         Vector3 pos = transform.position;
         for (int i = 0; i < lineCount; i++)
         {
-            lines[i] = Instantiate(prefab_Patt_Line, new Vector3((Random.Range(0, 0.2f)*i + pos.x), pos.y, (Random.Range(0, 0.2f) * i + pos.z)), Quaternion.identity);
+            lines[i] = Instantiate(prefab_Patt_Line, new Vector3((Random.Range(-1f, 1f)*i + pos.x), pos.y, (Random.Range(-1f, 1f) * i + pos.z)), Quaternion.identity);
             lines[i].transform.SetParent(transform);
             lines[i].SetActive(false);
         }
@@ -40,11 +40,17 @@ public class LineSpawner : MonoBehaviour
         }
 
         WaitForSeconds waitSec = new WaitForSeconds(4f);
-        for (int i = lineCount - 1; i >= 0; i--)
+        Vector3 pos = transform.position;
+        for (int k = 0; k < 10; k++)
         {
-            lines[i].SetActive(true);
-            //yield return waitSec;
-            yield return null;
+            for (int i = lineCount - 1; i >= 0; i--)
+            {
+                lines[i].transform.localPosition = new Vector3((Random.Range(-1f, 1f) * i + pos.x), pos.y, (Random.Range(-1f, 1f) * i + pos.z));
+                lines[i].SetActive(true);
+                yield return null;
+            }
+            yield return new WaitUntil(() => System.Array.TrueForAll(lines, (line) => !line.activeSelf));
+            yield return new WaitForSeconds(5);
         }
     }
 }

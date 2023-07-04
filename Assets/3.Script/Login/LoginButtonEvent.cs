@@ -87,11 +87,8 @@ public class LoginButtonEvent : MonoBehaviour
 
         foreach (var room in list_Room)
         {
-            Dictionary<int, string> dict_ID = room.CustomProperties[NetworkManager.instance.prop_PlayerID] as Dictionary<int, string>;
-            if (dict_ID.ContainsValue(id))
+            if(NetworkManager.instance.CheckHereIsThisID(room, id))
             {
-                // Match found! The ID is already connected in one of the rooms
-                // Handle the appropriate action, e.g., show an error message, prevent login, etc.
                 return true;
             }
         }

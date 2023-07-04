@@ -16,6 +16,7 @@ public class GameManager_Phase1 : MonoBehaviour
         {
             PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity);
             PhotonNetwork.Instantiate("NightMare_Green", new Vector3(0, 0, 5), Quaternion.identity);
+            PhotonNetwork.Instantiate("LineSpawner", Vector3.zero, Quaternion.identity);
         }
     }
 

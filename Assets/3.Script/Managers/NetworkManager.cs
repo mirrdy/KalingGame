@@ -25,10 +25,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	private List<RoomInfo> list_Room = new List<RoomInfo>();
 	private int roomNum = 0;
 	// Custom Property Name
-	public readonly string prop_PlayerID = "player_ID";
-	public readonly string prop_PlayerSelectionData = "player_SelectionData";
-	public readonly string prop_CanJoin = "canJoin";
-	public readonly string prop_MasterClientID = "masterClientID";
+	private readonly string prop_PlayerID = "player_ID";
+	private readonly string prop_PlayerSelectionData = "player_SelectionData";
+	private readonly string prop_CanJoin = "canJoin";
+	private readonly string prop_MasterClientID = "masterClientID";
 	private readonly string MethodExecutedKey = "MethodExecuted";
 
 	private void Awake()
@@ -456,5 +456,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			return (bool)methodExecutedObj;
 		}
 		return false;
+	}
+	public bool CheckHereIsThisID(RoomInfo room, string id)
+    {
+		Dictionary<int, string> dict_ID = room.CustomProperties[prop_PlayerID] as Dictionary<int, string>;
+
+		return dict_ID.ContainsValue(id);
 	}
 }
