@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,7 @@ public class WeatherGaugeManager : MonoBehaviour
     public static WeatherGaugeManager instance;
 
     [SerializeField] private Image[] gauges;
+    [SerializeField] private TextMeshProUGUI[] text;
 
     private void Awake()
     {
@@ -25,68 +27,47 @@ public class WeatherGaugeManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        NetworkManager.instance.onUpdateRoom_WeatherGauge = UpdateWeatherGauge;
+        NetworkManager.instance.onUpdateRoom_IsCrashed = DisplayWeatherIsCrashed;
     }
-    public void SetWeatherGauge(Weather weather, float value)
+    public void UpdateWeatherGauge()
     {
-        int weatherIndex = (int)weather;
-        int indexToGet = (weatherIndex + 2) % 3;
-        float amount = (value / 1000 / 3);
+        int[] weatherGauges = NetworkManager.instance.GetWeatherGauge();
 
-        gauges[weatherIndex].fillAmount = amount;
-        if(gauges[weatherIndex].fillAmount > 0.333f * weatherIndex)
+        for(int i=0; i<weatherGauges.Length; i++)
         {
-            gauges[weatherIndex].fillAmount = 0.333f * weatherIndex;
+            gauges[i].fillAmount = (weatherGauges[i] / 1000f / 3) + (0.333f * i);
+            text[i].text = weatherGauges[i].ToString();
         }
 
-        gauges[indexToGet].fillAmount -= amount;
-        if (gauges[indexToGet].fillAmount > 0.333f * indexToGet)
+        bool[] isCrashed = NetworkManager.instance.GetWeatherCrashed();
+    }
+    public void DisplayWeatherIsCrashed(int index)
+    {
+        Debug.Log($"{(Weather)index}ÀÌ(°¡) ºØ±«Çß´Ù");
+    }
+    public void AddSpringValue(int value)
+    {
+        if(NetworkManager.instance.GetWeatherCrashed()[(int)Weather.Spring])
         {
-            gauges[indexToGet].fillAmount = 0.333f * indexToGet;
+            return;
         }
-
-        switch (weather)
+        NetworkManager.instance.AddWeatherGauge(Weather.Spring, value);
+    }
+    public void AddSummerValue(int value)
+    {
+        if (NetworkManager.instance.GetWeatherCrashed()[(int)Weather.Summer])
         {
-            case Weather.Spring:
-                if (amount > 0.333f)
-                {
-                    amount = 0.333f;
-                }
-                break;
-            case Weather.Summer:
-                if (amount > 0.666f)
-                {
-                    amount = 0.666f;
-                }
-                break;
-            case Weather.Autumn:
-                if (amount > 1)
-                {
-                    amount = 1;
-                }
-                break;
-            default:
-                break;
+            return;
         }
+        NetworkManager.instance.AddWeatherGauge(Weather.Summer, value);
     }
-    private float GetCorrectionGauge(int index, float value)
+    public void AddAutumnValue(int value)
     {
-        if (gauges[index].fillAmount + value > 0.333f * index)
+        if (NetworkManager.instance.GetWeatherCrashed()[(int)Weather.Autumn])
         {
-            return 0.333f * index;
+            return;
         }
-
-        return value;
-    }
-    public void AddSpringValue(float value)
-    {
-        SetWeatherGauge(Weather.Spring, value);
-    }
-    public void AddSummerValue(float value)
-    {
-        SetWeatherGauge(Weather.Summer, value);
-    }
-    public void AddAutumnValue(float value)
-    {
-        SetWeatherGauge(Weather.Autumn, value);
+        NetworkManager.instance.AddWeatherGauge(Weather.Autumn, value);
     }
 }

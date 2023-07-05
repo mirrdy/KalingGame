@@ -15,11 +15,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public int playerID = -1;
 	public static NetworkManager instance = null;
 	string networkState;
+	private bool[] oldData_IsCrashed = new bool[] { false, false, false };
+	private int sharedLife = 1000;
 
+	// 델리게이트
 	public delegate void OnJoinedRoomDele();
 	public OnJoinedRoomDele onJoinedRoomDele;
-	public delegate void OnUpdateRoomProperty();
-	public OnUpdateRoomProperty onUpdateRoomProperty;
+	public delegate void OnUpdateRoom_PlayerID();
+	public OnUpdateRoom_PlayerID onUpdateRoom_PlayerID;
+	public delegate void OnUpdateRoom_WeatherGauge();
+	public OnUpdateRoom_WeatherGauge onUpdateRoom_WeatherGauge;
+	public delegate void OnUpdateRoom_SharedLife();
+	public OnUpdateRoom_SharedLife onUpdateRoom_SharedLife;
+	public delegate void OnUpdateRoom_IsCrashed(int index);
+	public OnUpdateRoom_IsCrashed onUpdateRoom_IsCrashed;
 
 	private Dictionary<string, RoomInfo> cachedRoomList = new Dictionary<string, RoomInfo>();
 	private List<RoomInfo> list_Room = new List<RoomInfo>();
@@ -30,6 +39,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	private readonly string prop_CanJoin = "canJoin";
 	private readonly string prop_MasterClientID = "masterClientID";
 	private readonly string MethodExecutedKey = "MethodExecuted";
+	private readonly string prop_SharedLife = "sharedLife";
+	private readonly string prop_WeatherGauge = "weatherGauge";
+	private readonly string prop_IsWeatherCrashed = "isWeatherCrashed";
 
 	private void Awake()
     {
@@ -156,15 +168,18 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             // Your properties
         };
 
-        ExitGames.Client.Photon.Hashtable customProperties =
-                new ExitGames.Client.Photon.Hashtable
-                {
+		ExitGames.Client.Photon.Hashtable customProperties =
+				new ExitGames.Client.Photon.Hashtable
+				{
 					// 커스텀 프로퍼티 만들기
 					{prop_PlayerID, new Dictionary<int, string>()},
-					{prop_PlayerSelectionData, new Dictionary<string, int>()},
-					{prop_MasterClientID, new Dictionary<int, string>() },
-					{prop_CanJoin, true },
-                };
+                    {prop_PlayerSelectionData, new Dictionary<string, int>()},
+                    {prop_MasterClientID, new Dictionary<int, string>() },
+                    {prop_CanJoin, true },
+                    {prop_SharedLife, 1000 },
+					{prop_WeatherGauge, new int[]{ 500, 500, 500 } },
+					{prop_IsWeatherCrashed, new bool[] { false, false, false } }
+				};
 
 		roomOptions.CustomRoomProperties = customProperties;
 
@@ -205,9 +220,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     public override void OnCreatedRoom()
     {
         base.OnCreatedRoom();
-
-		// 커스텀 프로퍼티 - Room을 Create를 해도 OnCreateRoom 이벤트보다 OnJoinedRoom이 먼저 실행되는 현상 발생
-		InitCustomProperty();
 	}
 
 	// 내가 들어왔을 때
@@ -225,7 +237,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			}
 		}*/
 
-		InitCustomProperty();
 		onJoinedRoomDele?.Invoke();
 	}
 
@@ -255,13 +266,155 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		onUpdateRoomProperty.Invoke();
 	}*/
 
+	// 프로퍼티 업데이트 이벤트
     public override void OnRoomPropertiesUpdate(ExitGames.Client.Photon.Hashtable propertiesThatChanged)
 	{
-		onUpdateRoomProperty.Invoke();
+		// Check if the specific properties have changed
+		if (propertiesThatChanged.ContainsKey(prop_PlayerID))
+		{
+			// Retrieve the new value of the property
+			object newValue = propertiesThatChanged[prop_PlayerID];
+
+			// Handle the property change here
+			Debug.Log($"Custom property with index {prop_PlayerID} changed to: {newValue}");
+			onUpdateRoom_PlayerID?.Invoke();
+		}
+
+		if (propertiesThatChanged.ContainsKey(prop_SharedLife))
+		{
+			// Retrieve the new value of the property
+			object newValue = propertiesThatChanged[prop_SharedLife];
+
+			// Handle the property change here
+			Debug.Log($"Custom property with index {prop_SharedLife} changed to: {newValue}");
+			onUpdateRoom_SharedLife?.Invoke();
+		}
+
+		if (propertiesThatChanged.ContainsKey(prop_WeatherGauge))
+		{
+			// Retrieve the new value of the property
+			object newValue = propertiesThatChanged[prop_WeatherGauge];
+
+			// Handle the property change here
+			Debug.Log($"Custom property with index {prop_WeatherGauge} changed to: {newValue}");
+			onUpdateRoom_WeatherGauge?.Invoke();
+		}
+		if(propertiesThatChanged.ContainsKey(prop_IsWeatherCrashed))
+        {
+			// Retrieve the new value of the property
+			bool[] newValue = (bool[])propertiesThatChanged[prop_IsWeatherCrashed];
+
+			int updatedIndex = -1;
+			for(int i=0; i<oldData_IsCrashed.Length; i++)
+            {
+				if(oldData_IsCrashed[i] != newValue[i])
+                {
+					updatedIndex = i;
+					break;
+                }
+            }
+			oldData_IsCrashed = (bool[])newValue.Clone();
+			// Handle the property change here
+			Debug.Log($"Custom property with index {prop_IsWeatherCrashed} changed to: {newValue}");
+			onUpdateRoom_IsCrashed?.Invoke(updatedIndex);
+		}
 	}
-	private void InitCustomProperty()
+	
+    public void AddWeatherGauge(Weather weather, int value)
     {
-			
+		Room room = PhotonNetwork.CurrentRoom;
+		if (!(room.CustomProperties[prop_WeatherGauge] is int[] weatherGauges))
+		{
+			return;
+		}
+
+		int indexToAdd = (int)weather;
+		int indexToSub = (indexToAdd + 2) % 3;
+
+		weatherGauges[indexToAdd] += value;
+		if(weatherGauges[indexToAdd] >= 1000)
+        {
+			weatherGauges[indexToAdd] = 1000;
+			SetWeatherCrashed(indexToAdd, true);
+        }
+
+		weatherGauges[indexToSub] -= value;
+		if(weatherGauges[indexToSub] <= 0)
+        {
+			weatherGauges[indexToSub] = 0;
+			SetWeatherCrashed(indexToSub, true);
+        }
+
+		ExitGames.Client.Photon.Hashtable customProperties =
+                new ExitGames.Client.Photon.Hashtable
+                {
+                    {prop_WeatherGauge, weatherGauges},
+                };
+
+        room.SetCustomProperties(customProperties);
+    }
+	public int[] GetWeatherGauge()
+	{
+		Room room = PhotonNetwork.CurrentRoom;
+		if (!(room.CustomProperties[prop_WeatherGauge] is int[] weatherGauges))
+		{
+			return null;
+		}
+
+		return (int[])weatherGauges.Clone();
+	}
+	public void SetWeatherCrashed(int index, bool isCrashed)
+    {
+		Room room = PhotonNetwork.CurrentRoom;
+
+		if(!(room.CustomProperties[prop_IsWeatherCrashed] is bool[] prop_IsCrashed))
+        {
+			return;
+        }
+
+		prop_IsCrashed[index] = isCrashed;
+
+		if (isCrashed)
+		{
+			SetSharedLife(sharedLife - 350);
+		}
+		ExitGames.Client.Photon.Hashtable customProperties =
+				new ExitGames.Client.Photon.Hashtable
+				{
+					{prop_IsWeatherCrashed, prop_IsCrashed},
+				};
+
+		room.SetCustomProperties(customProperties);
+	}
+	public bool[] GetWeatherCrashed()
+	{
+		Room room = PhotonNetwork.CurrentRoom;
+		
+		if (!(room.CustomProperties[prop_IsWeatherCrashed] is bool[] isCrashed))
+        {
+			return null;
+        }
+
+		return (bool[])isCrashed.Clone();
+	}
+	public int GetSharedLife()
+    {
+		Room room = PhotonNetwork.CurrentRoom;
+
+		return (int)room.CustomProperties[prop_SharedLife];
+    }
+	public void SetSharedLife(int value)
+    {
+		Room room = PhotonNetwork.CurrentRoom;
+
+		ExitGames.Client.Photon.Hashtable customProperties =
+				new ExitGames.Client.Photon.Hashtable
+				{
+					{prop_SharedLife, value},
+				};
+
+		sharedLife -= value;
+		room.SetCustomProperties(customProperties);
 	}
 	public void UpdatePlayerSelectionData(string id, int sel)
     {
@@ -379,6 +532,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 				}
 			});
 			SceneManager.LoadScene($"Phase1Boss{selectedBossNum}");
+			//SceneManager.LoadScene($"Phase1Boss{1}");
 		}
 	}
 
