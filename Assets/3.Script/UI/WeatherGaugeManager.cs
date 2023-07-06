@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public enum Weather
 {
@@ -10,10 +11,9 @@ public enum Weather
     Summer, //blue
     Autumn  //purple
 }
-public class WeatherGaugeManager : MonoBehaviour
+public class WeatherGaugeManager : MonoBehaviourPunCallbacks
 {
     public static WeatherGaugeManager instance;
-
     [SerializeField] private Image[] gauges;
     [SerializeField] private TextMeshProUGUI[] text;
 

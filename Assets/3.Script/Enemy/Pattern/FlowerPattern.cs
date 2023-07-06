@@ -7,7 +7,7 @@ public class FlowerPattern : MonoBehaviour
     [SerializeField]private ParticleSystem ps_Explode;
     private ParticleSystem ps;
     private BoxCollider boxTrigger;
-    
+    public Weather weather = Weather.Spring;
     private void Awake()
     {
         ps = Instantiate(ps_Explode, transform.position, Quaternion.identity);
@@ -57,9 +57,6 @@ public class FlowerPattern : MonoBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if(other.CompareTag("Player"))
-        {
-            Debug.Log($"tag:{other.tag}, name:{other.name}");
-        }
+        //
     }
 }

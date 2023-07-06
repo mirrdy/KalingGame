@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
+	public PhotonView PV;
 	public List<GameObject> Prefabs;
-
+	
 	private int playerCount = 0;
 	public int playerID = -1;
 	public static NetworkManager instance = null;
@@ -319,9 +320,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			onUpdateRoom_IsCrashed?.Invoke(updatedIndex);
 		}
 	}
-	
-    public void AddWeatherGauge(Weather weather, int value)
-    {
+
+	public void AddWeatherGauge(Weather weather, int value)
+	{
 		Room room = PhotonNetwork.CurrentRoom;
 		if (!(room.CustomProperties[prop_WeatherGauge] is int[] weatherGauges))
 		{
@@ -331,28 +332,34 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 		int indexToAdd = (int)weather;
 		int indexToSub = (indexToAdd + 2) % 3;
 
-		weatherGauges[indexToAdd] += value;
-		if(weatherGauges[indexToAdd] >= 1000)
-        {
-			weatherGauges[indexToAdd] = 1000;
-			SetWeatherCrashed(indexToAdd, true);
-        }
+		if (!GetWeatherCrashed()[indexToAdd])
+		{
+			weatherGauges[indexToAdd] += value;
+			if (weatherGauges[indexToAdd] >= 1000)
+			{
+				weatherGauges[indexToAdd] = 1000;
+				SetWeatherCrashed(indexToAdd, true);
+			}
+		}
 
-		weatherGauges[indexToSub] -= value;
-		if(weatherGauges[indexToSub] <= 0)
-        {
-			weatherGauges[indexToSub] = 0;
-			SetWeatherCrashed(indexToSub, true);
-        }
+		if (!GetWeatherCrashed()[indexToSub])
+		{
+			weatherGauges[indexToSub] -= value;
+			if (weatherGauges[indexToSub] <= 0)
+			{
+				weatherGauges[indexToSub] = 0;
+				SetWeatherCrashed(indexToSub, true);
+			}
+		}
 
 		ExitGames.Client.Photon.Hashtable customProperties =
-                new ExitGames.Client.Photon.Hashtable
-                {
-                    {prop_WeatherGauge, weatherGauges},
-                };
+				new ExitGames.Client.Photon.Hashtable
+				{
+					{prop_WeatherGauge, weatherGauges},
+				};
 
-        room.SetCustomProperties(customProperties);
-    }
+		room.SetCustomProperties(customProperties);
+	}
 	public int[] GetWeatherGauge()
 	{
 		Room room = PhotonNetwork.CurrentRoom;
@@ -376,7 +383,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 		if (isCrashed)
 		{
-			SetSharedLife(sharedLife - 350);
+			// 동시접근 Lock 처리 but how to prevent from Simultaneous-access
+			if (true)
+			{
+				SetSharedLife(GetSharedLife() - 350);
+			}
 		}
 		ExitGames.Client.Photon.Hashtable customProperties =
 				new ExitGames.Client.Photon.Hashtable
@@ -413,7 +424,6 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 					{prop_SharedLife, value},
 				};
 
-		sharedLife -= value;
 		room.SetCustomProperties(customProperties);
 	}
 	public void UpdatePlayerSelectionData(string id, int sel)
