@@ -9,7 +9,8 @@ public enum Weather
 {
     Spring, //yellow
     Summer, //blue
-    Autumn  //purple
+    Autumn,  //purple
+    None    // Not set yet
 }
 public class WeatherGaugeManager : MonoBehaviourPunCallbacks
 {

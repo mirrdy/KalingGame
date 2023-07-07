@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &7421786186730714932
 Transform:
   m_ObjectHideFlags: 0
@@ -44,7 +44,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 946575f3d2b02b14fb3824cc2b56ae0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  prefab_Patt_Line: {fileID: 2104214604318864345, guid: 1e5b9962ad3483340aa049eadda41a3f, type: 3}
+  prefab_Patt_Line:
+  - {fileID: 2104214604318864345, guid: 1e5b9962ad3483340aa049eadda41a3f, type: 3}
+  - {fileID: 2104214604318864345, guid: 8e87155831ceac64c9a47d33f8f76ca0, type: 3}
+  - {fileID: 2104214604318864345, guid: b4347b1bec5ae49439d8290e3e725a14, type: 3}
+  lineType: 3
   lineCount: 20
 --- !u!114 &-1595981640952890883
 MonoBehaviour:

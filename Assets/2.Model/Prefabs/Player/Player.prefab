@@ -1576,6 +1576,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47bbf10418854dc429725b3509fa6ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  flowerHitDelay: 3
 --- !u!1 &4762675044919261770
 GameObject:
   m_ObjectHideFlags: 0

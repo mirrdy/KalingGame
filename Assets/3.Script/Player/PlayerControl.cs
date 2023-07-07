@@ -7,7 +7,8 @@ using UnityEngine;
 public class PlayerControl : MonoBehaviourPunCallbacks
 {
 	private PhotonView PV;
-
+    [SerializeField] private float flowerHitDelay = 3f;
+    private float hitTime = 0;
 
     private void Awake()
     {
@@ -30,8 +31,12 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     {
         if (other.TryGetComponent(out FlowerPattern flower))
         {
-            Debug.Log($"tag:{other.tag}, name:{other.name}");
-            PV.RPC("AddWeatherGauge_RPC", RpcTarget.MasterClient, flower.weather, 60);
+            if (Time.realtimeSinceStartup - hitTime >= flowerHitDelay)
+            {
+                hitTime = Time.realtimeSinceStartup;
+                Debug.Log($"tag:{other.tag}, name:{other.name}");
+                PV.RPC("AddWeatherGauge_RPC", RpcTarget.MasterClient, flower.weather, 60);
+            }
         }
     }
 
