@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,13 +25,14 @@ public class FlowerPattern : MonoBehaviour
         {
             renderer.enabled = true;
         }
-        float scaleUpDelay = 0.1f;
+        float scale = 0.05f;
+        float scaleUpDelay = scale;
         WaitForSeconds waitSec = new WaitForSeconds(scaleUpDelay);
-        int scaleUpCount = (int)(0.8f / scaleUpDelay);
-
+        int scaleUpCount = (int)(1f / scaleUpDelay);
+        transform.localScale = new Vector3(scale, scale, scale);
         for(int i=0; i<scaleUpCount; i++)
         {
-            transform.localScale += new Vector3(0.05f, 0.05f, 0.05f);
+            transform.localScale += new Vector3(scale, scale, scale);
             yield return waitSec;
         }
         yield return new WaitForSeconds(2f);

@@ -97,6 +97,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ps_Explode: {fileID: 6959171889747704404, guid: f88247081afd5764aa2474fd77baeca7, type: 3}
+  weather: 0
 --- !u!65 &3630551617683686833
 BoxCollider:
   m_ObjectHideFlags: 0

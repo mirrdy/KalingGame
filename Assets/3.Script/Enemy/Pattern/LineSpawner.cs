@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,6 +13,9 @@ public class LineSpawner : MonoBehaviour
     private GameObject[] lines;
     private IEnumerator createLine_Co;
 
+    private PhotonView PV;
+    private int[] viewIDs_Line;
+
     private void OnEnable()
     {
         if (createLine_Co != null)
@@ -22,18 +26,28 @@ public class LineSpawner : MonoBehaviour
     }
     private void Start()
     {
-        lines = new GameObject[lineCount];
-        Vector3 pos = transform.position;
-
-        for (int i = 0; i < lineCount; i++)
+        if (!NetworkManager.instance.CheckThisIsMaster())
         {
-            lines[i] = Instantiate(prefab_Patt_Line[(int)lineType], new Vector3((Random.Range(-1f, 1f) * i + pos.x), pos.y, (Random.Range(-1f, 1f) * i + pos.z)), Quaternion.identity);
-            lines[i].transform.SetParent(transform);
-            lines[i].SetActive(false);
+            return;
         }
 
-        createLine_Co = StartLineCreate_Co();
-        StartCoroutine(createLine_Co);
+        lines = new GameObject[lineCount];
+        viewIDs_Line = new int[lineCount];
+        
+        for (int i = 0; i < lineCount; i++)
+        {
+            lines[i] = PhotonNetwork.Instantiate(prefab_Patt_Line[(int)lineType].name, Vector3.zero, Quaternion.identity);
+            viewIDs_Line[i] = lines[i].GetComponent<PhotonView>().ViewID;
+        }
+
+        if (TryGetComponent(out PV))
+        {
+            PV.RPC("SetTransform", RpcTarget.AllBuffered, new object[] { viewIDs_Line });
+        }
+        else
+        {
+            Debug.Log($"PhotonView Component can not find in {gameObject.name}");
+        }
     }
     private void OnDisable()
     {
@@ -51,7 +65,8 @@ public class LineSpawner : MonoBehaviour
         }
 
         WaitForSeconds waitSec = new WaitForSeconds(1f);
-        Vector3 pos = transform.position;
+
+        Vector3 pos = Vector3.zero;
 
         for (int i = lineCount - 1; i >= 0; i--)
         {
@@ -61,5 +76,23 @@ public class LineSpawner : MonoBehaviour
         }
         yield return new WaitUntil(() => System.Array.TrueForAll(lines, (line) => !line.activeSelf));
         gameObject.SetActive(false);
+    }
+
+    [PunRPC]
+    private void SetTransform(int[] viewIDs)
+    {
+        Vector3 pos = Vector3.zero;
+        for (int i = 0; i < viewIDs.Length; i++)
+        {
+            if (PhotonView.Find(viewIDs[i]).TryGetComponent(out LinePattern line))
+            {
+                line.transform.SetParent(transform);
+                line.transform.localPosition = new Vector3((Random.Range(-1f, 1f) * i + pos.x), pos.y, (Random.Range(-1f, 1f) * i + pos.z));
+                line.gameObject.SetActive(false);
+                lines[i] = line.gameObject; 
+            }
+        }
+        createLine_Co = StartLineCreate_Co();
+        StartCoroutine(createLine_Co);
     }
 }

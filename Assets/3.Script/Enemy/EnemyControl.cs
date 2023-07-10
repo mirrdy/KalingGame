@@ -24,7 +24,7 @@ public class EnemyControl : MonoBehaviour
     }
 
     [PunRPC]
-    public void TakeHitRPC(float damage)
+    public virtual void TakeHitRPC(float damage)
     {
         //Health -= damage;
         GetComponent<Animator>().SetTrigger("Hit");

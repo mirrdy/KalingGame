@@ -29,6 +29,10 @@ public class PlayerControl : MonoBehaviourPunCallbacks
 	
     private void OnTriggerEnter(Collider other)
     {
+        if (!PV.IsMine)
+        {
+            return;
+        }
         if (other.TryGetComponent(out FlowerPattern flower))
         {
             if (Time.realtimeSinceStartup - hitTime >= flowerHitDelay)

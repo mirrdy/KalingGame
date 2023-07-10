@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 2104214604318864346}
   - component: {fileID: 2104214604318864347}
+  - component: {fileID: 644913370043708897}
+  - component: {fileID: -2130586425236713930}
   m_Layer: 0
   m_Name: Patt_BlueLine
   m_TagString: Untagged
@@ -45,3 +47,42 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefab_Flower: {fileID: 6663488708960135039, guid: c659441ec64f2e643a5ddb09ad48f9a8, type: 3}
   flowerCount: 10
+--- !u!114 &644913370043708897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2104214604318864345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: -2130586425236713930}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &-2130586425236713930
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2104214604318864345}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 0

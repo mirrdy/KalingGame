@@ -7,21 +7,29 @@ using TMPro;
 
 public class GameManager_Phase1 : MonoBehaviour
 {
-    [SerializeField] private int bossNum = 1;
+    [SerializeField] private Transform[] bossFields;
     [SerializeField] private TextMeshProUGUI text_SharedLife;
-    private LineSpawner[] lineSpawners;
-    private readonly int lineSpawnerCount = 3;
-    private IEnumerator startLineSpawn_Co;
+    private PhotonView PV;
 
     private void Awake()
     {
-        lineSpawners = new LineSpawner[3];
         NetworkManager.instance.onUpdateRoom_SharedLife = UpdateSharedLife;
+        TryGetComponent(out PV);
     }
     // Start is called before the first frame update
     void Start()
     {
-        PhotonView pv = PhotonNetwork.Instantiate("Player", Vector3.zero, Quaternion.identity).GetComponentInChildren<PhotonView>();
+        if (!NetworkManager.instance.TryGetSelectedBoss(DBManager.instance.info.id, out int selectedBossNum))
+        {
+            return;
+        }
+
+        Transform boss = bossFields[selectedBossNum - 1];
+
+        PhotonView pv = PhotonNetwork.Instantiate("Player", boss.position, Quaternion.identity).GetComponent<PhotonView>();
+        //pv.transform.SetParent(boss);
+        //pv.transform.localPosition = Vector3.zero;
+
         if (pv != null)
         {
             NetworkManager.instance.PV = pv;
@@ -30,41 +38,33 @@ public class GameManager_Phase1 : MonoBehaviour
         {
             Debug.Log($"플레이어 생성 후 네트워크에 PhotonView 할당 실패");
         }
-        // 1페이즈 씬 -> 보스넘버 1
-        if (DBManager.instance.info.id.Equals(NetworkManager.instance.GetMasterClient(bossNum)))
+
+        //if (DBManager.instance.info.id.Equals(NetworkManager.instance.GetMasterClient(bossNum)))
+        if (NetworkManager.instance.CheckThisIsMaster())
         {
-            PhotonNetwork.Instantiate("NightMare_Green", new Vector3(0, 0, 5), Quaternion.identity);
-            for(int i=0; i<lineSpawnerCount; i++)
-            {
-                if(PhotonNetwork.Instantiate("LineSpawner", Vector3.zero, Quaternion.identity).TryGetComponent(out lineSpawners[i]))
-                {
-                    lineSpawners[i].gameObject.SetActive(false); // 프리팹이 이미 Active false인 상태이긴 함
-                    lineSpawners[i].lineType = (Weather)i;  // Spring, Summer, Autumn
-                }
-            }
-            startLineSpawn_Co = StartLineSpawn_Co();
-            StartCoroutine(startLineSpawn_Co);
+            GameObject yellow = PhotonNetwork.Instantiate("TerrorBringer_Yellow", Vector3.zero, Quaternion.identity);
+            PV.RPC("SetTransform_Boss", RpcTarget.AllBuffered, new object[] { yellow.GetComponent<PhotonView>().ViewID, (int)Weather.Spring });
+
+            GameObject green = PhotonNetwork.Instantiate("NightMare_Green", Vector3.zero, Quaternion.identity);
+            PV.RPC("SetTransform_Boss", RpcTarget.AllBuffered, new object[] { green.GetComponent<PhotonView>().ViewID, (int)Weather.Summer });
+
+            GameObject purple = PhotonNetwork.Instantiate("Usurper_Purple", Vector3.zero, Quaternion.identity);
+            PV.RPC("SetTransform_Boss", RpcTarget.AllBuffered, new object[] { purple.GetComponent<PhotonView>().ViewID, (int)Weather.Autumn });
         }
+    }
+
+    [PunRPC]
+    private void SetTransform_Boss(int viewID, int weather)
+    {
+        Transform field = bossFields[weather];
+        Transform boss = PhotonView.Find(viewID).transform;
+        boss.SetParent(field);
+        boss.localPosition = new Vector3(0, 0, 5);
     }
 
     public void UpdateSharedLife()
     {
         text_SharedLife.text = NetworkManager.instance.GetSharedLife().ToString();
     }
-    private IEnumerator StartLineSpawn_Co()
-    {
-        WaitForSeconds spawnDelay = new WaitForSeconds(3f);
-        while(true)
-        {
-            for(int i=0; i<lineSpawnerCount; i++)
-            {
-                lineSpawners[i].gameObject.SetActive(true);
-
-                yield return new WaitUntil(() => !lineSpawners[i].gameObject.activeSelf);
-                //lineSpawners[i].enabled = true;
-                //yield return new WaitUntil(() => !lineSpawners[i].enabled);
-                yield return spawnDelay;
-            }
-        }
-    }
+    
 }

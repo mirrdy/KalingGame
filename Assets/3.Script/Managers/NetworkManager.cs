@@ -541,8 +541,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
                     }
 				}
 			});
-			SceneManager.LoadScene($"Phase1Boss{selectedBossNum}");
-			//SceneManager.LoadScene($"Phase1Boss{1}");
+			//SceneManager.LoadScene($"Phase1Boss{selectedBossNum}");
+			SceneManager.LoadScene($"Phase1Boss{1}");
 		}
 	}
 
@@ -612,6 +612,10 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 		return dict_MasterID[bossNum];
 	}
+	public bool CheckThisIsMaster()
+    {
+		return PhotonNetwork.IsMasterClient;
+    }
 
 	private bool IsMethodExecuted()
 	{
