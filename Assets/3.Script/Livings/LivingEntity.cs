@@ -22,6 +22,7 @@ public class LivingEntity : MonoBehaviour
     {
         // 초기상태 설정할 것
         currentHp = hp;
+        TryGetComponent(out animator);
         //currentState = new MonsterIdleState();
         //ChangeState(new MonsterIdleState());
     }

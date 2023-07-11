@@ -47,6 +47,6 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     [PunRPC]
 	public void AddWeatherGauge_RPC(Weather weather, int value)
 	{
-        NetworkManager.instance.AddWeatherGauge(weather, value);
+        NetworkManager.instance.Enqueue_AddWeatherGauge(weather, value);
     }
 }

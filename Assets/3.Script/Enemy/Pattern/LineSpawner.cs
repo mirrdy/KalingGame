@@ -15,7 +15,11 @@ public class LineSpawner : MonoBehaviour
 
     private PhotonView PV;
     private int[] viewIDs_Line;
-
+    private void Awake()
+    {
+        lines = new GameObject[lineCount];
+        viewIDs_Line = new int[lineCount];
+    }
     private void OnEnable()
     {
         if (createLine_Co != null)
@@ -31,9 +35,6 @@ public class LineSpawner : MonoBehaviour
             return;
         }
 
-        lines = new GameObject[lineCount];
-        viewIDs_Line = new int[lineCount];
-        
         for (int i = 0; i < lineCount; i++)
         {
             lines[i] = PhotonNetwork.Instantiate(prefab_Patt_Line[(int)lineType].name, Vector3.zero, Quaternion.identity);
@@ -86,10 +87,10 @@ public class LineSpawner : MonoBehaviour
         {
             if (PhotonView.Find(viewIDs[i]).TryGetComponent(out LinePattern line))
             {
+                lines[i] = line.gameObject;
                 line.transform.SetParent(transform);
                 line.transform.localPosition = new Vector3((Random.Range(-1f, 1f) * i + pos.x), pos.y, (Random.Range(-1f, 1f) * i + pos.z));
                 line.gameObject.SetActive(false);
-                lines[i] = line.gameObject; 
             }
         }
         createLine_Co = StartLineCreate_Co();

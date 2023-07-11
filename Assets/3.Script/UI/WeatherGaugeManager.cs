@@ -53,7 +53,7 @@ public class WeatherGaugeManager : MonoBehaviourPunCallbacks
         {
             return;
         }
-        NetworkManager.instance.AddWeatherGauge(Weather.Spring, value);
+        NetworkManager.instance.Enqueue_AddWeatherGauge(Weather.Spring, value);
     }
     public void AddSummerValue(int value)
     {
@@ -61,7 +61,7 @@ public class WeatherGaugeManager : MonoBehaviourPunCallbacks
         {
             return;
         }
-        NetworkManager.instance.AddWeatherGauge(Weather.Summer, value);
+        NetworkManager.instance.Enqueue_AddWeatherGauge(Weather.Summer, value);
     }
     public void AddAutumnValue(int value)
     {
@@ -69,6 +69,6 @@ public class WeatherGaugeManager : MonoBehaviourPunCallbacks
         {
             return;
         }
-        NetworkManager.instance.AddWeatherGauge(Weather.Autumn, value);
+        NetworkManager.instance.Enqueue_AddWeatherGauge(Weather.Autumn, value);
     }
 }

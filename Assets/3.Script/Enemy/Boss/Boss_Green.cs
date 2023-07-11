@@ -17,9 +17,11 @@ public class Boss_Green : EnemyControl
         TryGetComponent(out PV);
         viewIDs_LineSpawner = new int[lineSpawnerCount];
     }
+
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
         if (!NetworkManager.instance.CheckThisIsMaster())
         {
             return;
@@ -35,9 +37,9 @@ public class Boss_Green : EnemyControl
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
-
+        base.Update();
     }
 
     private IEnumerator StartLineSpawn_Co()

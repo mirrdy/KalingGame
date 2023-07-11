@@ -48,10 +48,7 @@ public class RoomPuller : MonoBehaviourPunCallbacks
 
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        if (callback != null)
-        {
-            callback(roomList);
-        }
+        callback?.Invoke(roomList);
         // 모든 작업이 끝나면 서브 클라이언트 연결 해제
         client.Disconnect();
     }

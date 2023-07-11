@@ -10,25 +10,39 @@ public class LinePattern : MonoBehaviour
 
     private GameObject[] flowers;
     private IEnumerator createLine_Co;
+
+    private PhotonView PV;
     private void Awake()
     {
+        TryGetComponent(out PV);
         flowers = new GameObject[flowerCount];
-        Vector3 pos = transform.position;
         for (int i = 0; i < flowerCount; i++)
         {
-            flowers[i] = Instantiate(prefab_Flower, new Vector3(pos.x, pos.y+(i*0.5f), pos.z), Quaternion.identity);
+            Vector3 pos = transform.position;
+            flowers[i] = Instantiate(prefab_Flower, new Vector3(pos.x, pos.y + (i * 0.5f), pos.z), Quaternion.identity);
             flowers[i].transform.SetParent(transform);
             flowers[i].SetActive(false);
         }
+        //if (NetworkManager.instance.CheckThisIsMaster())
+        //{
+        //    PV.RPC("SetTransform", RpcTarget.AllBuffered);
+        //}
     }
     private void OnEnable()
     {
-        createLine_Co = StartLinePattern_Co();
-        StartCoroutine(createLine_Co);
+        StartCreateLine();
+        //if (NetworkManager.instance.CheckThisIsMaster())
+        //{       
+        //    PV.RPC("StartCreateLine", RpcTarget.AllBuffered);
+        //}
     }
     private void OnDisable()
     {
-        StopCoroutine(createLine_Co);
+        StopCreateLine();
+        //if (NetworkManager.instance.CheckThisIsMaster())
+        //{
+        //    PV.RPC("StopCreateLine", RpcTarget.AllBuffered);
+        //}
     }
 
     IEnumerator StartLinePattern_Co()
@@ -49,5 +63,26 @@ public class LinePattern : MonoBehaviour
         int lastOffIndex = 0;
         yield return new WaitUntil(() => flowers[lastOffIndex].activeSelf == false);
         gameObject.SetActive(false);
+    }
+
+    [PunRPC]
+    private void SetTransform()
+    {   
+        for (int i = 0; i < flowerCount; i++)
+        {
+            flowers[i].transform.SetParent(transform);
+            flowers[i].SetActive(false);
+        }
+    }
+    [PunRPC]
+    private void StartCreateLine()
+    {
+        createLine_Co = StartLinePattern_Co();
+        StartCoroutine(createLine_Co);
+    }
+    [PunRPC]
+    private void StopCreateLine()
+    {
+        StopCoroutine(createLine_Co);
     }
 }

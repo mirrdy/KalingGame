@@ -6,6 +6,7 @@ using Photon.Realtime;
 using UnityEngine.SceneManagement;
 using System.Linq;
 using System.Threading.Tasks;
+using System;
 
 public class NetworkManager : MonoBehaviourPunCallbacks
 {
@@ -18,6 +19,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	string networkState;
 	private bool[] oldData_IsCrashed = new bool[] { false, false, false };
 	private int sharedLife = 1000;
+	public Queue<List<object>> queue_WeatherFunc = new Queue<List<object>>();
+	private bool isLocked_AddWeatherGauge = false;
+	private bool isLocked_SetSharedLife = false;
 
 	// 델리게이트
 	public delegate void OnJoinedRoomDele();
@@ -30,6 +34,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public OnUpdateRoom_SharedLife onUpdateRoom_SharedLife;
 	public delegate void OnUpdateRoom_IsCrashed(int index);
 	public OnUpdateRoom_IsCrashed onUpdateRoom_IsCrashed;
+	public delegate void OnGameOver();
+	public OnGameOver onGameOver;
 
 	private Dictionary<string, RoomInfo> cachedRoomList = new Dictionary<string, RoomInfo>();
 	private List<RoomInfo> list_Room = new List<RoomInfo>();
@@ -78,12 +84,16 @@ public class NetworkManager : MonoBehaviourPunCallbacks
         {
             networkState = curNetworkState;
         }
-
-        if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom)
-        {
+		UpdateCurrentPlayer();
+		ExecuteMethodQueue();
+    }
+	private void UpdateCurrentPlayer()
+    {
+		if (PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InRoom)
+		{
 			// 서버에 접속 인원 변동 발생
-			if(playerCount != PhotonNetwork.CurrentRoom.PlayerCount)
-            {
+			if (playerCount != PhotonNetwork.CurrentRoom.PlayerCount)
+			{
 				// 접속이 종료된 클라이언트가 발생
 				// 접속 종료시 안정적인 이벤트 처리 방법이 떠오르면 수정할 예정
 				if (playerCount > PhotonNetwork.CurrentRoom.PlayerCount)
@@ -103,25 +113,34 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 							keysForRemove.Add(roomID);
 						}
 					}
-					foreach(int roomID in keysForRemove)
-                    {
+					foreach (int roomID in keysForRemove)
+					{
 						dict_ID.Remove(roomID);
 					}
-					
 
-                    ExitGames.Client.Photon.Hashtable customProperties =
-                        new ExitGames.Client.Photon.Hashtable
-                        {
+
+					ExitGames.Client.Photon.Hashtable customProperties =
+						new ExitGames.Client.Photon.Hashtable
+						{
 							{ prop_PlayerID, dict_ID },
 							{ prop_PlayerSelectionData, dict_Sel}
-                        };
-                    room.SetCustomProperties(customProperties);
+						};
+					room.SetCustomProperties(customProperties);
 				}
 
 				// 인원 변동시 필요한 동작 후 인원수 동기화
-                playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
-            }
-        }
+				playerCount = PhotonNetwork.CurrentRoom.PlayerCount;
+			}
+		}
+	}
+	private void ExecuteMethodQueue()
+    {
+		if (queue_WeatherFunc.Count <= 0 || isLocked_AddWeatherGauge)
+			return;
+
+		isLocked_AddWeatherGauge = true;
+		List<object> list_params = queue_WeatherFunc.Dequeue();
+		AddWeatherGauge((Weather)list_params[0], (int)list_params[1]);
     }
 
 	private void UpdateCachedRoomList(List<RoomInfo> roomList)
@@ -288,7 +307,13 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 			// Handle the property change here
 			Debug.Log($"Custom property with index {prop_SharedLife} changed to: {newValue}");
+			isLocked_SetSharedLife = false;
 			onUpdateRoom_SharedLife?.Invoke();
+			if((int)newValue<0)
+            {
+				Debug.Log("Game Over");
+				onGameOver?.Invoke();
+            }
 		}
 
 		if (propertiesThatChanged.ContainsKey(prop_WeatherGauge))
@@ -298,6 +323,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 			// Handle the property change here
 			Debug.Log($"Custom property with index {prop_WeatherGauge} changed to: {newValue}");
+			isLocked_AddWeatherGauge = false;
 			onUpdateRoom_WeatherGauge?.Invoke();
 		}
 		if(propertiesThatChanged.ContainsKey(prop_IsWeatherCrashed))
@@ -320,8 +346,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			onUpdateRoom_IsCrashed?.Invoke(updatedIndex);
 		}
 	}
-
-	public void AddWeatherGauge(Weather weather, int value)
+	public void Enqueue_AddWeatherGauge(Weather weather, int value)
+    {
+		queue_WeatherFunc.Enqueue(new List<object> { weather, value });
+    }
+	public async void AddWeatherGauge(Weather weather, int value)
 	{
 		Room room = PhotonNetwork.CurrentRoom;
 		if (!(room.CustomProperties[prop_WeatherGauge] is int[] weatherGauges))
@@ -341,6 +370,15 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 				SetWeatherCrashed(indexToAdd, true);
 			}
 		}
+
+		await Task.Run(() =>
+        {
+			while(true)
+            {
+				if (isLocked_SetSharedLife == false) return;
+            }
+        }
+		);
 
 		if (!GetWeatherCrashed()[indexToSub])
 		{
@@ -394,7 +432,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 				{
 					{prop_IsWeatherCrashed, prop_IsCrashed},
 				};
-
+		
 		room.SetCustomProperties(customProperties);
 	}
 	public bool[] GetWeatherCrashed()
@@ -424,6 +462,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 					{prop_SharedLife, value},
 				};
 
+		isLocked_SetSharedLife = true;
 		room.SetCustomProperties(customProperties);
 	}
 	public void UpdatePlayerSelectionData(string id, int sel)
