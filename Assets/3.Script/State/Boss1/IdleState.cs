@@ -38,9 +38,24 @@ public class IdleState : EntityState
                 boss.ChangeState(new ChaseState());
             }
         }
+        else
+        {
+            Vector3 bossPos = boss.transform.position;
+            float radius = 20f; 
+            int layerMask = LayerMask.GetMask("Player");
+
+            Collider[] colliders = Physics.OverlapSphere(bossPos, radius, layerMask);
+
+            foreach (Collider collider in colliders)
+            {
+                boss.target = collider.transform;
+                break;
+            }
+        }
     }
     public override void ExitState(LivingEntity entity)
     {
 
     }
+    
 }

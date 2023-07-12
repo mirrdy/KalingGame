@@ -7,6 +7,8 @@ public class EnemyControl : LivingEntity
 {
     public Transform target;
     public bool canAttack;
+    public bool isAttackTriggerOn;
+    public Weather weather;
 
     private void Awake()
     {

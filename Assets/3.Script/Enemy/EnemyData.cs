@@ -11,6 +11,8 @@ public class EnemyData : ScriptableObject
     public float attackTime = 1f;
     public float moveSpeed = 1f;
     public float attackRange = 2f;
+    public float attackDelay = 3f;
+    public Weather weather;
     public string monsterName = "basicBoss";
 }
 

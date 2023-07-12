@@ -5,6 +5,7 @@ using UnityEngine;
 
 public class Boss_Green : EnemyControl
 {
+    [SerializeField] private EnemyData data_Stat;
     private LineSpawner[] lineSpawners;
     private readonly int lineSpawnerCount = 3;
     private IEnumerator startLineSpawn_Co;
@@ -13,9 +14,51 @@ public class Boss_Green : EnemyControl
 
     private void Awake()
     {
+        InitStatData();
+        SetTrigger();
         lineSpawners = new LineSpawner[3];
         TryGetComponent(out PV);
         viewIDs_LineSpawner = new int[lineSpawnerCount];
+    }
+    private void SetTrigger()
+    {
+        Collider[] cols = GetComponentsInChildren<Collider>();
+        foreach(Collider col in cols)
+        {
+            // 피격 판정 ON
+            col.isTrigger = true;
+            col.tag = "Enemy";
+            
+            // 공격 판정은 공격 할때만 킬 예정
+            if(col.TryGetComponent(out AttackObject atkObj))
+            {
+                atkObj.enabled = false;
+            }
+        }
+    }
+    private void InitStatData()
+    {
+        hp = data_Stat.hp;
+        atk = data_Stat.atk;
+        def = data_Stat.def;
+        attackTime = data_Stat.attackTime;
+        moveSpeed = data_Stat.moveSpeed;
+        attackRange = data_Stat.attackRange;
+        attackDelay = data_Stat.attackDelay;
+        weather = data_Stat.weather;
+        
+        canAttack = true;
+    }
+    public void EndAttack()
+    {
+        StartCoroutine(AttackTime_co());
+    }
+    private IEnumerator AttackTime_co()
+    {
+        canAttack = false;
+        ChangeState(new IdleState());
+        yield return new WaitForSeconds(attackDelay);
+        canAttack = true;
     }
 
     // Start is called before the first frame update
@@ -68,7 +111,7 @@ public class Boss_Green : EnemyControl
             {
                 lineSpawner.gameObject.SetActive(false); // 프리팹이 이미 Active false인 상태이긴 함
                 lineSpawner.lineType = (Weather)i;  // Spring, Summer, Autumn
-                lineSpawner.transform.SetParent(transform);
+                lineSpawner.transform.SetParent(transform.parent);
                 lineSpawner.transform.localPosition = Vector3.zero;
 
                 lineSpawners[i] = lineSpawner; // Master Client 기준에서는 중복선언

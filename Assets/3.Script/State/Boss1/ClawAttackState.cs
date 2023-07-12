@@ -7,7 +7,7 @@ public class ClawAttackState : EntityState
     public override void EnterState(LivingEntity entity)
     {
         entity.animator.SetBool("isClawAttack", true);
-        AudioManager.instance.PlaySFX("ClawAttack");
+        //AudioManager.instance.PlaySFX("ClawAttack");
     }
 
     public override void ExitState(LivingEntity entity)

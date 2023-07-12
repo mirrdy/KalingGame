@@ -6,7 +6,15 @@ using UnityEngine;
 
 public class PlayerControl : MonoBehaviourPunCallbacks
 {
-	private PhotonView PV;
+    [Header("Stats")]
+    [SerializeField] private int maxHp = 100;
+    [SerializeField] public int currentHp { get; private set; }
+    [SerializeField] private bool isDead = false;
+
+    public delegate void WhenPlayerDie();
+    public event WhenPlayerDie whenPlayerDie;
+
+    private PhotonView PV;
     [SerializeField] private float flowerHitDelay = 3f;
     private float hitTime = 0;
 
@@ -26,7 +34,24 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     {
         
     }
-	
+
+    public void OnDamage(int damage, Weather weather, int weatherGaugeValue)
+    {
+        if(!PV.IsMine)
+        {
+            return;
+        }
+        currentHp -= damage;
+        PV.RPC("AddWeatherGauge_RPC", RpcTarget.MasterClient, weather, weatherGaugeValue);
+        if (currentHp <= 0) //Á×¾úÀ»¶§
+        {
+            currentHp = 0;
+            isDead = true;
+            whenPlayerDie?.Invoke();
+        }
+        //uiManager.HpCheck(status.maxHp, status.currentHp);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (!PV.IsMine)

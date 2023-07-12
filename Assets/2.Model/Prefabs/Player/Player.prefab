@@ -51,7 +51,7 @@ GameObject:
   - component: {fileID: 4553434795036964428}
   - component: {fileID: 4525800155463951007}
   - component: {fileID: 6947981502358723668}
-  m_Layer: 8
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -387,6 +387,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 47bbf10418854dc429725b3509fa6ef4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxHp: 100
+  isDead: 0
   flowerHitDelay: 3
 --- !u!114 &6947981502358723668
 MonoBehaviour:

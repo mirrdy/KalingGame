@@ -18,10 +18,6 @@ public class ChaseState : EntityState
 
     public override void UpdateState(LivingEntity entity)
     {
-        //if (boss.isHit)
-        //{
-        //    boss.target = PlayerControl.instance.transform;
-        //}
         if (boss.target != null)
         {
             Vector3 targetPosition = boss.target.transform.position;
@@ -29,16 +25,17 @@ public class ChaseState : EntityState
             Vector3 direction = targetPosition - entity.transform.position;
             direction.Normalize();
             float distance = Vector3.Distance(boss.transform.position, targetPosition);
-            //entity.transform.position += direction * 10 * Time.deltaTime;
             if (boss.enabled)
             {
                 boss.transform.position += (boss.moveSpeed * Time.deltaTime * direction);
             }
             // 몬스터가 플레이어 쪽을 바라보도록 회전 설정
             Vector3 playerDirection = boss.target.position - entity.transform.position;
+
             playerDirection.y = 0; // Y 축 방향을 무시하여 평면 상의 방향만 고려합니다.
             Quaternion targetRotation = Quaternion.LookRotation(playerDirection);
             boss.transform.rotation = targetRotation;
+
             if (distance <= boss.attackRange * 4 && boss.canAttack)
             {
                 int randNum = Random.Range(0, 2);
