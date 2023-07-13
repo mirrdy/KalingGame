@@ -11,6 +11,7 @@ public class Boss_Green : EnemyControl
     private IEnumerator startLineSpawn_Co;
     private PhotonView PV;
     private int[] viewIDs_LineSpawner;
+    public AttackObject[] atkObjects;
 
     private void Awake()
     {
@@ -28,12 +29,13 @@ public class Boss_Green : EnemyControl
             // 피격 판정 ON
             col.isTrigger = true;
             col.tag = "Enemy";
-            
-            // 공격 판정은 공격 할때만 킬 예정
-            if(col.TryGetComponent(out AttackObject atkObj))
-            {
-                atkObj.enabled = false;
-            }
+        }
+
+        // 공격 판정은 공격 할때만 킬 예정
+        atkObjects = GetComponentsInChildren<AttackObject>();
+        foreach(AttackObject atkObj in atkObjects)
+        {
+            atkObj.triggerEnabled = false;
         }
     }
     private void InitStatData()
@@ -48,6 +50,13 @@ public class Boss_Green : EnemyControl
         weather = data_Stat.weather;
         
         canAttack = true;
+    }
+    public void InitAttackPoint()
+    {
+        foreach(AttackObject atkObj in atkObjects)
+        {
+            atkObj.triggerEnabled = false;
+        }
     }
     public void EndAttack()
     {

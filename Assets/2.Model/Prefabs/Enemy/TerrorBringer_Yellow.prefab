@@ -2400,6 +2400,7 @@ MonoBehaviour:
   isAttackTriggerOn: 0
   weather: 0
   data_Stat: {fileID: 11400000, guid: 6f26d4eb9a6d5b8428eede982f695699, type: 2}
+  atkObjects: []
 --- !u!1 &7046923262068959689
 GameObject:
   m_ObjectHideFlags: 0

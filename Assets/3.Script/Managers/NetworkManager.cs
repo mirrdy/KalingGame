@@ -296,7 +296,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			object newValue = propertiesThatChanged[prop_PlayerID];
 
 			// Handle the property change here
-			Debug.Log($"Custom property with index {prop_PlayerID} changed to: {newValue}");
+			//Debug.Log($"Custom property with index {prop_PlayerID} changed to: {newValue}");
 			onUpdateRoom_PlayerID?.Invoke();
 		}
 
@@ -306,7 +306,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			object newValue = propertiesThatChanged[prop_SharedLife];
 
 			// Handle the property change here
-			Debug.Log($"Custom property with index {prop_SharedLife} changed to: {newValue}");
+			//Debug.Log($"Custom property with index {prop_SharedLife} changed to: {newValue}");
 			isLocked_SetSharedLife = false;
 			onUpdateRoom_SharedLife?.Invoke();
 			if((int)newValue<0)
@@ -322,7 +322,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			object newValue = propertiesThatChanged[prop_WeatherGauge];
 
 			// Handle the property change here
-			Debug.Log($"Custom property with index {prop_WeatherGauge} changed to: {newValue}");
+			//Debug.Log($"Custom property with index {prop_WeatherGauge} changed to: {newValue}");
 			isLocked_AddWeatherGauge = false;
 			onUpdateRoom_WeatherGauge?.Invoke();
 		}
@@ -342,7 +342,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
 			oldData_IsCrashed = (bool[])newValue.Clone();
 			// Handle the property change here
-			Debug.Log($"Custom property with index {prop_IsWeatherCrashed} changed to: {newValue}");
+			//Debug.Log($"Custom property with index {prop_IsWeatherCrashed} changed to: {newValue}");
 			onUpdateRoom_IsCrashed?.Invoke(updatedIndex);
 		}
 	}

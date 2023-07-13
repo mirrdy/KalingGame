@@ -29,13 +29,13 @@ public class IdleState : EntityState
 
             boss.transform.rotation = targetRotation;
 
-            if (distance <= 5 && boss.canAttack)
+            if (distance <= entity.attackRange && boss.canAttack)
             {
                 boss.ChangeState(new ChaseState());
             }
-            else if (distance > 5)
+            else if (distance > entity.attackRange)
             {
-                boss.ChangeState(new ChaseState());
+                boss.ChangeState(new JumpState());
             }
         }
         else

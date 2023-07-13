@@ -36,36 +36,45 @@ public class ChaseState : EntityState
             Quaternion targetRotation = Quaternion.LookRotation(playerDirection);
             boss.transform.rotation = targetRotation;
 
-            if (distance <= boss.attackRange * 4 && boss.canAttack)
+            if(boss.canAttack)
             {
-                int randNum = Random.Range(0, 2);
-                switch (randNum)
+                if (distance <= boss.attackRange * 3)
                 {
-                    case 0: boss.ChangeState(new ClawAttackState()); break;
-                    case 1: boss.ChangeState(new ClawAttackState()); break;
+                    int randNum = Random.Range(0, 2);
+                    switch (randNum)
+                    {
+                        case 0: boss.ChangeState(new ClawAttackState()); break;
+                        case 1: boss.ChangeState(new ClawAttackState()); break;
+                    }
+                }
+                else if (distance <= boss.attackRange * 3 && distance > boss.attackRange)
+                {
+                    boss.ChangeState(new ClawAttackState());
+                }
+                else if (distance <= boss.attackRange)
+                {
+                    int randAtk = Random.Range(1, 6);
+                    switch (randAtk)
+                    {
+                        case 1: boss.ChangeState(new ClawAttackState()); break;
+                        case 2: boss.ChangeState(new ClawAttackState()); break;
+                        case 3: boss.ChangeState(new ClawAttackState()); break;
+                        case 4: boss.ChangeState(new ClawAttackState()); break;
+                        case 5: boss.ChangeState(new ClawAttackState()); break;
+                    }
+                }
+                else if(distance > boss.attackRange)
+                {
+                    boss.ChangeState(new JumpState());
                 }
             }
-            if (distance <= boss.attackRange * 3 && distance > boss.attackRange && boss.canAttack)
+            else
             {
-                boss.ChangeState(new ClawAttackState());
-            }
-            if (distance <= boss.attackRange && boss.canAttack)
-            {
-                int randAtk = Random.Range(1, 6);
-                switch (randAtk)
+                if (distance <= boss.attackRange)
                 {
-                    case 1: boss.ChangeState(new ClawAttackState()); break;
-                    case 2: boss.ChangeState(new ClawAttackState()); break;
-                    case 3: boss.ChangeState(new ClawAttackState()); break;
-                    case 4: boss.ChangeState(new ClawAttackState()); break;
-                    case 5: boss.ChangeState(new ClawAttackState()); break;
+                    boss.ChangeState(new IdleState());
                 }
             }
-            if (distance <= boss.attackRange && !boss.canAttack)
-            {
-                boss.ChangeState(new IdleState());
-            }
-
         }
         if (boss.target == null)
         {
