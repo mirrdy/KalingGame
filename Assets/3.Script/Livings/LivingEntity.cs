@@ -27,8 +27,8 @@ public class LivingEntity : MonoBehaviour
         // 초기상태 설정할 것
         currentHp = hp;
         TryGetComponent(out animator);
-        currentState = new IdleState();
-        ChangeState(currentState);
+        //currentState = new GreenState_Idle();
+        //ChangeState(currentState);
     }
     protected virtual void Update()
     {

@@ -5,19 +5,28 @@ using UnityEngine;
 public class BreathMaker : MonoBehaviour
 {
     [SerializeField] private ParticleSystem ps;
-    // Start is called before the first frame update
-    void Start()
-    {
-        for(int i=0; i<20; i++)
-        {
-            ParticleSystem obj = Instantiate(ps, transform.position + i*transform.forward, Quaternion.identity);
-            Debug.Log(obj.transform.position);
-        }
-    }
+    private ParticleSystem breath;
+    public Transform target;
+    IEnumerator breathe_Co;
 
-    // Update is called once per frame
-    void Update()
+    private void Awake()
+    {
+        breath = Instantiate(ps, transform.position + Vector3.back, Quaternion.identity);
+        breath.gameObject.SetActive(false);
+        breathe_Co = Breathe_Co();
+    }
+    private void OnEnable()
+    {
+        StartCoroutine(breathe_Co);
+    }
+    private void OnDisable()
+    {
+        StopCoroutine(breathe_Co);
+    }
+    private IEnumerator Breathe_Co()
     {
         
+
+        yield return null;
     }
 }
