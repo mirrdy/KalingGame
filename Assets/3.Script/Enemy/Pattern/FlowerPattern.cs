@@ -8,7 +8,7 @@ public class FlowerPattern : MonoBehaviour
     [SerializeField]private ParticleSystem ps_Explode;
     private ParticleSystem ps;
     private BoxCollider boxTrigger;
-    public Weather weather = Weather.Spring;
+    public Season season = Season.Spring;
     private void Awake()
     {
         ps = Instantiate(ps_Explode, transform.position, Quaternion.identity);

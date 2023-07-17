@@ -3960,7 +3960,7 @@ MonoBehaviour:
   target: {fileID: 0}
   canAttack: 0
   isAttackTriggerOn: 0
-  weather: 2
+  season: 0
   data_Stat: {fileID: 11400000, guid: c74f4f67657e8664cb435c3939725539, type: 2}
   atkObjects: []
 --- !u!1 &4954353905251905490

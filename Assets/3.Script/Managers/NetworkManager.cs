@@ -19,8 +19,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	string networkState;
 	private bool[] oldData_IsCrashed = new bool[] { false, false, false };
 	private int sharedLife = 1000;
-	public Queue<List<object>> queue_WeatherFunc = new Queue<List<object>>();
-	private bool isLocked_AddWeatherGauge = false;
+	public Queue<List<object>> queue_SeasonFunc = new Queue<List<object>>();
+	private bool isLocked_AddSeasonGauge = false;
 	private bool isLocked_SetSharedLife = false;
 
 	// 델리게이트
@@ -28,8 +28,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public OnJoinedRoomDele onJoinedRoomDele;
 	public delegate void OnUpdateRoom_PlayerID();
 	public OnUpdateRoom_PlayerID onUpdateRoom_PlayerID;
-	public delegate void OnUpdateRoom_WeatherGauge();
-	public OnUpdateRoom_WeatherGauge onUpdateRoom_WeatherGauge;
+	public delegate void OnUpdateRoom_SeasonGauge();
+	public OnUpdateRoom_SeasonGauge onUpdateRoom_SeasonGauge;
 	public delegate void OnUpdateRoom_SharedLife();
 	public OnUpdateRoom_SharedLife onUpdateRoom_SharedLife;
 	public delegate void OnUpdateRoom_IsCrashed(int index);
@@ -47,8 +47,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	private readonly string prop_MasterClientID = "masterClientID";
 	private readonly string MethodExecutedKey = "MethodExecuted";
 	private readonly string prop_SharedLife = "sharedLife";
-	private readonly string prop_WeatherGauge = "weatherGauge";
-	private readonly string prop_IsWeatherCrashed = "isWeatherCrashed";
+	private readonly string prop_SeasonGauge = "seasonGauge";
+	private readonly string prop_IsSeasonCrashed = "isSeasonCrashed";
 
 	private void Awake()
     {
@@ -135,12 +135,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	}
 	private void ExecuteMethodQueue()
     {
-		if (queue_WeatherFunc.Count <= 0 || isLocked_AddWeatherGauge)
+		if (queue_SeasonFunc.Count <= 0 || isLocked_AddSeasonGauge)
 			return;
 
-		isLocked_AddWeatherGauge = true;
-		List<object> list_params = queue_WeatherFunc.Dequeue();
-		AddWeatherGauge((Weather)list_params[0], (int)list_params[1]);
+		isLocked_AddSeasonGauge = true;
+		List<object> list_params = queue_SeasonFunc.Dequeue();
+		AddSeasonGauge((Season)list_params[0], (int)list_params[1]);
     }
 
 	private void UpdateCachedRoomList(List<RoomInfo> roomList)
@@ -197,8 +197,8 @@ public class NetworkManager : MonoBehaviourPunCallbacks
                     {prop_MasterClientID, new Dictionary<int, string>() },
                     {prop_CanJoin, true },
                     {prop_SharedLife, 1000 },
-					{prop_WeatherGauge, new int[]{ 500, 500, 500 } },
-					{prop_IsWeatherCrashed, new bool[] { false, false, false } }
+					{prop_SeasonGauge, new int[]{ 500, 500, 500 } },
+					{prop_IsSeasonCrashed, new bool[] { false, false, false } }
 				};
 
 		roomOptions.CustomRoomProperties = customProperties;
@@ -316,20 +316,20 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
 		}
 
-		if (propertiesThatChanged.ContainsKey(prop_WeatherGauge))
+		if (propertiesThatChanged.ContainsKey(prop_SeasonGauge))
 		{
 			// Retrieve the new value of the property
-			object newValue = propertiesThatChanged[prop_WeatherGauge];
+			object newValue = propertiesThatChanged[prop_SeasonGauge];
 
 			// Handle the property change here
-			//Debug.Log($"Custom property with index {prop_WeatherGauge} changed to: {newValue}");
-			isLocked_AddWeatherGauge = false;
-			onUpdateRoom_WeatherGauge?.Invoke();
+			//Debug.Log($"Custom property with index {prop_SeasonGauge} changed to: {newValue}");
+			isLocked_AddSeasonGauge = false;
+			onUpdateRoom_SeasonGauge?.Invoke();
 		}
-		if(propertiesThatChanged.ContainsKey(prop_IsWeatherCrashed))
+		if(propertiesThatChanged.ContainsKey(prop_IsSeasonCrashed))
         {
 			// Retrieve the new value of the property
-			bool[] newValue = (bool[])propertiesThatChanged[prop_IsWeatherCrashed];
+			bool[] newValue = (bool[])propertiesThatChanged[prop_IsSeasonCrashed];
 
 			int updatedIndex = -1;
 			for(int i=0; i<oldData_IsCrashed.Length; i++)
@@ -342,77 +342,68 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
 			oldData_IsCrashed = (bool[])newValue.Clone();
 			// Handle the property change here
-			//Debug.Log($"Custom property with index {prop_IsWeatherCrashed} changed to: {newValue}");
+			//Debug.Log($"Custom property with index {prop_IsSeasonCrashed} changed to: {newValue}");
 			onUpdateRoom_IsCrashed?.Invoke(updatedIndex);
 		}
 	}
-	public void Enqueue_AddWeatherGauge(Weather weather, int value)
+	public void Enqueue_AddSeasonGauge(Season season, int value)
     {
-		queue_WeatherFunc.Enqueue(new List<object> { weather, value });
+		queue_SeasonFunc.Enqueue(new List<object> { season, value });
     }
-	public async void AddWeatherGauge(Weather weather, int value)
+	public void AddSeasonGauge(Season season, int value)
 	{
 		Room room = PhotonNetwork.CurrentRoom;
-		if (!(room.CustomProperties[prop_WeatherGauge] is int[] weatherGauges))
+		if (!(room.CustomProperties[prop_SeasonGauge] is int[] seasonGauges))
 		{
 			return;
 		}
 
-		int indexToAdd = (int)weather;
+		int indexToAdd = (int)season;
 		int indexToSub = (indexToAdd + 2) % 3;
 
-		if (!GetWeatherCrashed()[indexToAdd])
+		if (!GetSeasonCrashed()[indexToAdd])
 		{
-			weatherGauges[indexToAdd] += value;
-			if (weatherGauges[indexToAdd] >= 1000)
+			seasonGauges[indexToAdd] += value;
+			if (seasonGauges[indexToAdd] >= 1000)
 			{
-				weatherGauges[indexToAdd] = 1000;
-				SetWeatherCrashed(indexToAdd, true);
+				seasonGauges[indexToAdd] = 1000;
+				SetSeasonCrashed(indexToAdd, true);
 			}
 		}
 
-		await Task.Run(() =>
-        {
-			while(true)
-            {
-				if (isLocked_SetSharedLife == false) return;
-            }
-        }
-		);
-
-		if (!GetWeatherCrashed()[indexToSub])
+		if (!GetSeasonCrashed()[indexToSub])
 		{
-			weatherGauges[indexToSub] -= value;
-			if (weatherGauges[indexToSub] <= 0)
+			seasonGauges[indexToSub] -= value;
+			if (seasonGauges[indexToSub] <= 0)
 			{
-				weatherGauges[indexToSub] = 0;
-				SetWeatherCrashed(indexToSub, true);
+				seasonGauges[indexToSub] = 0;
+				SetSeasonCrashed(indexToSub, true);
 			}
 		}
 
 		ExitGames.Client.Photon.Hashtable customProperties =
 				new ExitGames.Client.Photon.Hashtable
 				{
-					{prop_WeatherGauge, weatherGauges},
+					{prop_SeasonGauge, seasonGauges},
 				};
 
 		room.SetCustomProperties(customProperties);
 	}
-	public int[] GetWeatherGauge()
+	public int[] GetSeasonGauge()
 	{
 		Room room = PhotonNetwork.CurrentRoom;
-		if (!(room.CustomProperties[prop_WeatherGauge] is int[] weatherGauges))
+		if (!(room.CustomProperties[prop_SeasonGauge] is int[] seasonGauges))
 		{
 			return null;
 		}
 
-		return (int[])weatherGauges.Clone();
+		return (int[])seasonGauges.Clone();
 	}
-	public void SetWeatherCrashed(int index, bool isCrashed)
+	public void SetSeasonCrashed(int index, bool isCrashed)
     {
 		Room room = PhotonNetwork.CurrentRoom;
 
-		if(!(room.CustomProperties[prop_IsWeatherCrashed] is bool[] prop_IsCrashed))
+		if(!(room.CustomProperties[prop_IsSeasonCrashed] is bool[] prop_IsCrashed))
         {
 			return;
         }
@@ -424,22 +415,23 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			// 동시접근 Lock 처리 but how to prevent from Simultaneous-access
 			if (true)
 			{
-				SetSharedLife(GetSharedLife() - 350);
+				//SetSharedLife(GetSharedLife() - 350);
+				AddSharedLife(-350);
 			}
 		}
 		ExitGames.Client.Photon.Hashtable customProperties =
 				new ExitGames.Client.Photon.Hashtable
 				{
-					{prop_IsWeatherCrashed, prop_IsCrashed},
+					{prop_IsSeasonCrashed, prop_IsCrashed},
 				};
 		
 		room.SetCustomProperties(customProperties);
 	}
-	public bool[] GetWeatherCrashed()
+	public bool[] GetSeasonCrashed()
 	{
 		Room room = PhotonNetwork.CurrentRoom;
 		
-		if (!(room.CustomProperties[prop_IsWeatherCrashed] is bool[] isCrashed))
+		if (!(room.CustomProperties[prop_IsSeasonCrashed] is bool[] isCrashed))
         {
 			return null;
         }
@@ -454,6 +446,7 @@ public class NetworkManager : MonoBehaviourPunCallbacks
     }
 	public void SetSharedLife(int value)
     {
+		isLocked_SetSharedLife = true;
 		Room room = PhotonNetwork.CurrentRoom;
 
 		ExitGames.Client.Photon.Hashtable customProperties =
@@ -462,8 +455,27 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 					{prop_SharedLife, value},
 				};
 
-		isLocked_SetSharedLife = true;
 		room.SetCustomProperties(customProperties);
+	}
+	public void AddSharedLife(int value)
+	{
+		StartCoroutine(AddSharedLife_Co(value));
+	}
+	private IEnumerator AddSharedLife_Co(int value)
+    {
+		// 이벤트가 동시에 일어났을 때 Set이 업데이트 되기 전에 상대적으로 늦게 발생한 이벤트에서도 초기 프로퍼티 값을 참조해서 값을 변경함
+		// 프로퍼티를 Set할 때마다 이전 Set이 반영이 되었는지 확인이 필요함
+		while (true)
+		{
+			if (isLocked_SetSharedLife == false)
+			{
+				break;
+			}
+			yield return null;
+		}
+
+		SetSharedLife(GetSharedLife() + value);
+		yield break;
 	}
 	public void UpdatePlayerSelectionData(string id, int sel)
     {

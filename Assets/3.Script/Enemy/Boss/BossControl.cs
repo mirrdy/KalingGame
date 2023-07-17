@@ -20,15 +20,15 @@ public class BossControl : EnemyControl
         lineSpawners = new LineSpawner[3];
         TryGetComponent(out PV);
         viewIDs_LineSpawner = new int[lineSpawnerCount];
-        if (weather == Weather.Spring)
+        if (season == Season.Spring)
         {
             currentState = new YellowState_Idle();
         }
-        else if (weather == Weather.Summer)
+        else if (season == Season.Summer)
         {
             currentState = new GreenState_Idle();
         }
-        else if (weather == Weather.Autumn)
+        else if (season == Season.Autumn)
         {
             currentState = new PurpleState_Idle();
         }
@@ -60,7 +60,7 @@ public class BossControl : EnemyControl
         moveSpeed = data_Stat.moveSpeed;
         attackRange = data_Stat.attackRange;
         attackDelay = data_Stat.attackDelay;
-        weather = data_Stat.weather;
+        season = data_Stat.weather;
         
         canAttack = true;
     }
@@ -84,15 +84,15 @@ public class BossControl : EnemyControl
     }
     private void SetIdleState()
     {
-        if (weather == Weather.Spring)
+        if (season == Season.Spring)
         {
             ChangeState(new YellowState_Idle());
         }
-        else if (weather == Weather.Summer)
+        else if (season == Season.Summer)
         {
             ChangeState(new GreenState_Idle());
         }
-        else if (weather == Weather.Autumn)
+        else if (season == Season.Autumn)
         {
             ChangeState(new PurpleState_Idle());
         }
@@ -147,7 +147,7 @@ public class BossControl : EnemyControl
             if (PhotonView.Find(viewIDs[i]).TryGetComponent(out LineSpawner lineSpawner))
             {
                 lineSpawner.gameObject.SetActive(false); // 프리팹이 이미 Active false인 상태이긴 함
-                lineSpawner.lineType = (Weather)i;  // Spring, Summer, Autumn
+                lineSpawner.lineType = (Season)i;  // Spring, Summer, Autumn
                 lineSpawner.transform.SetParent(transform.parent);
                 lineSpawner.transform.localPosition = Vector3.zero;
 

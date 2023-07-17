@@ -7,7 +7,7 @@ using UnityEngine;
 public class LineSpawner : MonoBehaviour
 {
     [SerializeField] private GameObject[] prefab_Patt_Line;
-    public Weather lineType = Weather.None;
+    public Season lineType = Season.None;
     [SerializeField] private int lineCount = 20;
 
     private GameObject[] lines;

@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class AreaDamage : MonoBehaviour
 {
-    public Weather weather;
+    public Season season;
     public int damage;
-    public int weatherPower;
+    public int seasonPower;
     public float tickRate;
     private PlayerControl player;
     private float triggerStartTime;
@@ -88,7 +88,7 @@ public class AreaDamage : MonoBehaviour
 
         while(player != null)
         {
-            player.OnDamage(damage, weather, weatherPower);
+            player.OnDamage(damage, season, seasonPower);
             yield return delay;
         }
     }

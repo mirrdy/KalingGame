@@ -44,7 +44,7 @@ public class GreenState_Chase : EntityState
                     switch (randNum)
                     {
                         case 0: boss.ChangeState(new GreenState_ClawAttack()); break;
-                        case 1: boss.ChangeState(new GreenState_ClawAttack()); break;
+                        case 1: boss.ChangeState(new GreenState_Breath()); break;
                     }
                 }
                 else if (distance <= boss.attackRange * 3 && distance > boss.attackRange)

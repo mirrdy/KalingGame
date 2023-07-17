@@ -9,6 +9,7 @@ public class PurpleState_ClawAttack : EntityState
     private Vector3 direction;
     private const int FRAME_DASH_START = 35;
     private const int FRAME_DASH_END = 61;
+
     public override void EnterState(LivingEntity entity)
     {
         SetTargetPos(entity);
@@ -34,7 +35,7 @@ public class PurpleState_ClawAttack : EntityState
     public override void UpdateState(LivingEntity entity)
     {
         AnimatorStateInfo aniState = entity.animator.GetCurrentAnimatorStateInfo(0);
-        if (!aniState.IsName("isClawAttack"))
+        if (!aniState.IsName("Claw Attack"))
         {
             return;
         }
@@ -43,12 +44,13 @@ public class PurpleState_ClawAttack : EntityState
         AnimationClip clip = clipInfo[0].clip;
         float sampleRate = clip.frameRate;
 
-        float jumpMoveTime = (FRAME_DASH_END - FRAME_DASH_START) / sampleRate;
+        float dashTime = (FRAME_DASH_END - FRAME_DASH_START) / sampleRate;
 
         if (aniState.normalizedTime >= (FRAME_DASH_START / sampleRate) / clip.length &&
             aniState.normalizedTime <= (FRAME_DASH_END / sampleRate) / clip.length)
         {
-            entity.transform.position += (direction / (jumpMoveTime / Time.deltaTime));
+            entity.transform.position += (direction / (dashTime / Time.deltaTime));
+            
         }
     }
 }

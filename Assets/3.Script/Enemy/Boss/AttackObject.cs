@@ -24,7 +24,7 @@ public class AttackObject : MonoBehaviour
                 damage = Mathf.RoundToInt(GetComponentInParent<EnemyControl>().atk);
                 Vector3 hitPoint = other.ClosestPoint(transform.position);
                 Vector3 hitNormal = transform.position - other.transform.position;
-                player.OnDamage(damage, boss.weather, weatherPower);
+                player.OnDamage(damage, boss.season, weatherPower);
                 Debug.Log($"{gameObject.name}에 맞았음");
             }
         }
