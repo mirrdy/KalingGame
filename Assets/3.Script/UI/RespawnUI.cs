@@ -67,6 +67,7 @@ public class RespawnUI : MonoBehaviour
             renderer.enabled = true;
             control.enabled = true;
         }
-        myPlayer.currentHp = myPlayer.maxHp;
+        myPlayer.SetCurrentHp(myPlayer.maxHp);
+        myPlayer.transform.position = myPlayer.spawnPos;
     }
 }

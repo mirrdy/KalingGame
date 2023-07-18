@@ -10,10 +10,12 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     public int currentHp;
     [SerializeField] private bool isDead = false;
 
+    public delegate void WhenPlayerDamaged();
+    public event WhenPlayerDamaged whenPlayerDamaged;
     public delegate void WhenPlayerDie();
     public event WhenPlayerDie whenPlayerDie;
 
-    private Vector3 spawnPos;
+    public Vector3 spawnPos { get; private set; }
     private PhotonView PV;
     [SerializeField] private float flowerHitDelay = 3f;
     private float hitTime = 0;
@@ -21,7 +23,7 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     private void Awake()
     {
 		TryGetComponent(out PV);
-        currentHp = maxHp;
+        SetCurrentHp(maxHp);
         spawnPos = transform.position;
     }
 
@@ -43,9 +45,11 @@ public class PlayerControl : MonoBehaviourPunCallbacks
         {
             return;
         }
-        currentHp -= damage;
+
+        SetCurrentHp(currentHp - damage);
         Debug.Log($"HP:{currentHp}");
         PV.RPC("AddSeasonGauge_RPC", RpcTarget.MasterClient, season, seasonGaugeValue);
+        
         if (currentHp <= 0) //죽었을때
         {
             currentHp = 0;
@@ -53,7 +57,6 @@ public class PlayerControl : MonoBehaviourPunCallbacks
             whenPlayerDie?.Invoke();
             Die();
         }
-        //uiManager.HpCheck(status.maxHp, status.currentHp);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -62,6 +65,7 @@ public class PlayerControl : MonoBehaviourPunCallbacks
         {
             return;
         }
+        // 꽃실 패턴 중복타격 여기서 처리함
         if (other.TryGetComponent(out FlowerPattern flower))
         {
             if (Time.realtimeSinceStartup - hitTime >= flowerHitDelay)
@@ -69,10 +73,32 @@ public class PlayerControl : MonoBehaviourPunCallbacks
                 hitTime = Time.realtimeSinceStartup;
                 Debug.Log($"tag:{other.tag}, name:{other.name}");
                 PV.RPC("AddSeasonGauge_RPC", RpcTarget.MasterClient, flower.season, 60);
+                SetCurrentHp(currentHp - 10);
             }
         }
     }
-
+    public void SetCurrentHp(int hp)
+    {
+        if(hp < 0)
+        {
+            hp = 0;
+        }
+        else if(hp > maxHp)
+        {
+            hp = maxHp;
+        }
+        currentHp = hp;
+        UIManager.instance.HpCheck(maxHp, currentHp);
+    }
+    public void SetMaxHp(int hp)
+    {
+        if(hp < 0)
+        {
+            hp = 0;
+        }
+        maxHp = hp;
+        UIManager.instance.HpCheck(maxHp, currentHp);
+    }
     private void Die()
     {
         NetworkManager.instance.AddSharedLife(-100);
@@ -84,10 +110,8 @@ public class PlayerControl : MonoBehaviourPunCallbacks
             control.enabled = false;
             renderer.enabled = false;
 
-            transform.position = spawnPos;
             UIManager.instance.DisplayRespawnUI();
         }
-        currentHp = maxHp;
     }
 
     [PunRPC]
