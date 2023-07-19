@@ -1025,16 +1025,16 @@ MonoBehaviour:
   ShowParameterInspector: 1
   m_SynchronizeParameters:
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isMove
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isClawAttack
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isJump
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isScream
   m_SynchronizeLayers:
   - SynchronizeType: 2

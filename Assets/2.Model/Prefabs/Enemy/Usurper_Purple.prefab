@@ -3908,19 +3908,19 @@ MonoBehaviour:
   ShowParameterInspector: 1
   m_SynchronizeParameters:
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isBasicAttack
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isFlameAttack
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isFlyFlameAttack
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isWalk
   - Type: 4
-    SynchronizeType: 0
+    SynchronizeType: 2
     Name: isClawAttack
   m_SynchronizeLayers:
   - SynchronizeType: 2

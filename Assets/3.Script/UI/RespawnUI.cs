@@ -29,7 +29,7 @@ public class RespawnUI : MonoBehaviour
     }
     private void OnDisable()
     {
-        Respawn();
+        myPlayer.Respawn();
     }
     // Start is called before the first frame update
     void Start()
@@ -59,15 +59,6 @@ public class RespawnUI : MonoBehaviour
 
     private void Respawn()
     {
-        // CharacterController가 transform을 update 할 때 trigger에서 변경한 position을 반영하지 않는 것 같음 - 컨트롤러를 끄고 position 변경 후 다시 킴
-        if (myPlayer.TryGetComponent(out CharacterController control))
-        {
-            SkinnedMeshRenderer renderer = myPlayer.GetComponentInChildren<SkinnedMeshRenderer>();
-
-            renderer.enabled = true;
-            control.enabled = true;
-        }
-        myPlayer.SetCurrentHp(myPlayer.maxHp);
-        myPlayer.transform.position = myPlayer.spawnPos;
+        
     }
 }
