@@ -56,9 +56,4 @@ public class RespawnUI : MonoBehaviour
     {
         gameObject.SetActive(false);
     }
-
-    private void Respawn()
-    {
-        
-    }
 }

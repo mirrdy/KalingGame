@@ -8,6 +8,7 @@ public class BreathMaker : MonoBehaviour
     private ParticleSystem breath;
     public Transform target;
     IEnumerator breathe_Co;
+    private float startMakeTime;
 
     private void Awake()
     {
@@ -25,8 +26,15 @@ public class BreathMaker : MonoBehaviour
     }
     private IEnumerator Breathe_Co()
     {
+        startMakeTime = Time.time;
+        while(true)
+        {
+            if(Time.time > startMakeTime+1)
+            {
+                yield break;
+            }
+            yield return null;
+        }
         
-
-        yield return null;
     }
 }

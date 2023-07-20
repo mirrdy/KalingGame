@@ -53,4 +53,5 @@ MonoBehaviour:
   - {fileID: 2104214604318864345, guid: 8e87155831ceac64c9a47d33f8f76ca0, type: 3}
   - {fileID: 2104214604318864345, guid: b4347b1bec5ae49439d8290e3e725a14, type: 3}
   - {fileID: 2104214604318864345, guid: 1e5b9962ad3483340aa049eadda41a3f, type: 3}
+  - {fileID: 1741836768671013064, guid: 5099ad3b2a3dd944b8ed7d27657120d3, type: 3}
   playerID: -1
