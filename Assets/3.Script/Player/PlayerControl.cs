@@ -151,11 +151,13 @@ public class PlayerControl : MonoBehaviourPunCallbacks
         // CharacterController가 transform을 update 할 때 trigger에서 변경한 position을 반영하지 않는 것 같음 - 컨트롤러를 끄고 position 변경 후 다시 킴
         if (TryGetComponent(out CharacterController control))
         {
-            SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
+            Renderer[] renderers = GetComponentsInChildren<Renderer>();
+            foreach(Renderer renderer in renderers)
+            {
+                renderer.enabled = false;
+            }
 
             control.enabled = false;
-            renderer.enabled = false;
-
             UIManager.instance.DisplayRespawnUI();
         }
     }
@@ -164,9 +166,12 @@ public class PlayerControl : MonoBehaviourPunCallbacks
         // CharacterController가 transform을 update 할 때 trigger에서 변경한 position을 반영하지 않는 것 같음 - 컨트롤러를 끄고 position 변경 후 다시 킴
         if (TryGetComponent(out CharacterController control))
         {
-            SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
+            Renderer[] renderers = GetComponentsInChildren<Renderer>();
+            foreach (Renderer renderer in renderers)
+            {
+                renderer.enabled = true;
+            }
 
-            renderer.enabled = true;
             control.enabled = true;
         }
         SetCurrentHp(maxHp);
