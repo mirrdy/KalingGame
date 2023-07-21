@@ -53,7 +53,7 @@ public class BossControl : EnemyControl
     }
     private void InitStatData()
     {
-        hp = data_Stat.hp;
+        maxHp = data_Stat.maxHp;
         atk = data_Stat.atk;
         def = data_Stat.def;
         attackTime = data_Stat.attackTime;
@@ -121,6 +121,11 @@ public class BossControl : EnemyControl
     {
         base.Update();
     }
+    public override void TakeDamage(int damage)
+    {
+        base.TakeDamage(damage);
+        PV.RPC("TakeDamage_RPC", RpcTarget.AllBuffered, new object[] { damage });
+    }
 
     private IEnumerator StartLineSpawn_Co()
     {
@@ -156,5 +161,16 @@ public class BossControl : EnemyControl
         }
         startLineSpawn_Co = StartLineSpawn_Co();
         StartCoroutine(startLineSpawn_Co);
+    }
+    [PunRPC]
+    private void TakeDamage_RPC(int damage)
+    {
+        damage -= Mathf.RoundToInt(damage * (1 - def));
+        currentHp -= damage;
+        if(currentHp <= 0)
+        {
+            Debug.Log($"{season} Boss dies");
+            animator.SetTrigger("Die");
+        }
     }
 }

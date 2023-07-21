@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LivingEntity : MonoBehaviour
 {
-    public float hp { get; protected set; }
+    public float maxHp { get; protected set; }
 
     public float currentHp;
     public float def { get; protected set; }
@@ -25,7 +25,7 @@ public class LivingEntity : MonoBehaviour
     protected virtual void Start()
     {
         // 초기상태 설정할 것
-        currentHp = hp;
+        currentHp = maxHp;
         TryGetComponent(out animator);
         //currentState = new GreenState_Idle();
         //ChangeState(currentState);
@@ -43,7 +43,6 @@ public class LivingEntity : MonoBehaviour
 
     public virtual void TakeDamage(int damage)
     {
-        damage -= Mathf.RoundToInt(damage * (1-def));
-        currentHp -= damage;
+        
     }
 }

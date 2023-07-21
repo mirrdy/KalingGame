@@ -12,10 +12,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f403fe41275d04488fb60b55b5baed2, type: 3}
   m_Name: TerrorBringer_Yellow
   m_EditorClassIdentifier: 
-  hp: 1000
+  maxHp: 100
   atk: 30
   def: 0.1
   attackTime: 1
   moveSpeed: 1
   attackRange: 2
+  attackDelay: 3
+  weather: 0
   monsterName: basicBoss

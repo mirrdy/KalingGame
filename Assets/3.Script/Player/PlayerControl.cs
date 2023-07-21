@@ -20,15 +20,44 @@ public class PlayerControl : MonoBehaviourPunCallbacks
 
     public Vector3 spawnPos { get; private set; }
     private PhotonView PV;
+    private Animator animator;
     [SerializeField] private float flowerHitDelay = 3f;
+    private bool canAction;
+    private float actionCool = 0;
     private float hitTime = 0;
+
+    #region animation Hash
+    private int animID_Speed;
+    private int animID_Ground;
+    private int animID_Jump;
+    private int animID_Falling;
+    private int animID_BasicSlash;
+    private int animID_TripleSlash;
+    private int animID_Die;
+    private int animID_AttackSpeed;
+    #endregion
 
     private void Awake()
     {
         TryGetComponent(out PV);
+        TryGetComponent(out animator);
         SetCurrentHp(maxHp);
         SetCurrentMp(maxMp);
+        AssignAnimationID();
         spawnPos = transform.position;
+    }
+    private void AssignAnimationID()
+    {
+        animID_Speed = Animator.StringToHash("Speed");
+        animID_Ground = Animator.StringToHash("Ground");
+        animID_Jump = Animator.StringToHash("Jump");
+        animID_Falling = Animator.StringToHash("Falling");
+        animID_BasicSlash = Animator.StringToHash("BasicSlash");
+        animID_TripleSlash = Animator.StringToHash("TripleSlash");
+        animID_Die = Animator.StringToHash("Die");
+
+        animID_AttackSpeed = Animator.StringToHash("AttackSpeed");
+        
     }
 
     // Start is called before the first frame update
@@ -42,8 +71,39 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     {
         if (!isDead && PV.IsMine)
         {
+            Attack();
             CheckUsePotion();
         }
+    }
+    private void Attack()
+    {
+        actionCool += Time.deltaTime;
+
+        if (Input.GetMouseButton(0))
+        {
+            float attackSpeed = 0.5f;
+            if(actionCool > 1f * attackSpeed)
+            {
+                //AudioManager.instance.PlaySFX("PlayerSwordAttack");
+                //animator.SetFloat(animID_AttackSpeed, 0.533f / attackSpeed);
+                animator.SetTrigger(animID_BasicSlash);
+
+                actionCool = 0;
+            }
+        }
+        if(Input.GetKey(KeyCode.Q))
+        {
+            float attackSpeed = 5f;
+            if (actionCool > 1f * attackSpeed)
+            {
+                //AudioManager.instance.PlaySFX("PlayerSwordAttack");
+                //animator.SetFloat(animID_AttackSpeed, 0.533f / attackSpeed);
+                animator.SetTrigger(animID_TripleSlash);
+
+                actionCool = 0;
+            }
+        }
+
     }
 
     private void CheckUsePotion()
