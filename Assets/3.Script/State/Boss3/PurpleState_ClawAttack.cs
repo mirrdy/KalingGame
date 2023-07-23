@@ -13,7 +13,7 @@ public class PurpleState_ClawAttack : EntityState
     public override void EnterState(LivingEntity entity)
     {
         SetTargetPos(entity);
-        entity.animator.SetBool("isClawAttack", true);
+        entity.animator.SetTrigger("isClawAttack");
         //AudioManager.instance.PlaySFX("ClawAttack");
     }
     private void SetTargetPos(LivingEntity entity)
@@ -22,7 +22,7 @@ public class PurpleState_ClawAttack : EntityState
         {
             startPos = boss.transform.position;
             targetPos = boss.target.position;
-            direction = targetPos - startPos;
+            direction = targetPos - startPos + new Vector3(0.2f, 0.2f, 0.2f);
         }
     }
 

@@ -29,17 +29,17 @@ public class YellowState_Idle : EntityState
 
             boss.transform.rotation = targetRotation;
 
-            if (distance <= entity.attackRange / 2 && boss.canAttack)
+            if (distance <= entity.attackRange)
             {
-                boss.ChangeState(new GreenState_Chase());
+                boss.ChangeState(new YellowState_ClawAttack());
             }
             else if (distance <= entity.attackRange)
             {
-                boss.ChangeState(new GreenState_Breath());
+                boss.ChangeState(new YellowState_ClawAttack());
             }
             else if (distance > entity.attackRange)
             {
-                boss.ChangeState(new GreenState_Jump());
+                boss.ChangeState(new YellowState_Chase());
             }
         }
         else

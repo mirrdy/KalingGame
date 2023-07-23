@@ -4,14 +4,28 @@ using UnityEngine;
 using Photon;
 using Photon.Pun;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class GameManager_Phase1 : MonoBehaviour
 {
+    public static GameManager_Phase1 instance;
     [SerializeField] private Transform[] bossFields;
     private PhotonView PV;
+    [SerializeField] private RectTransform panel_GameOver;
+    public bool isGameOver;
 
     private void Awake()
     {
+        if(instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         TryGetComponent(out PV);
     }
     // Start is called before the first frame update
@@ -49,6 +63,21 @@ public class GameManager_Phase1 : MonoBehaviour
             GameObject purple = PhotonNetwork.Instantiate("Usurper_Purple", Vector3.zero, Quaternion.identity);
             PV.RPC("SetTransform_Boss", RpcTarget.AllBuffered, new object[] { purple.GetComponent<PhotonView>().ViewID, (int)Season.Autumn });
         }
+    }
+    private void Update()
+    {
+        if(NetworkManager.instance.GetSharedLife() <= 0)
+        {
+            StartCoroutine(GameOver_Co());
+            
+        }
+    }
+    IEnumerator GameOver_Co()
+    {
+        isGameOver = true;
+        panel_GameOver.gameObject.SetActive(true);
+        yield return new WaitForSeconds(5f);
+        SceneManager.LoadScene("GameOver");
     }
 
     [PunRPC]

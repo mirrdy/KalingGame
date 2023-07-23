@@ -32,20 +32,15 @@ public class GreenState_Chase : EntityState
             // 몬스터가 플레이어 쪽을 바라보도록 회전 설정
             Vector3 playerDirection = boss.target.position - entity.transform.position;
 
-            playerDirection.y = 0; // Y 축 방향을 무시하여 평면 상의 방향만 고려합니다.
+            //playerDirection.y = 0; // Y 축 방향을 무시하여 평면 상의 방향만 고려합니다.
             Quaternion targetRotation = Quaternion.LookRotation(playerDirection);
             boss.transform.rotation = targetRotation;
 
-            if(boss.canAttack)
+            if (boss.canAttack)
             {
                 if (distance <= boss.attackRange * 3)
                 {
-                    int randNum = Random.Range(0, 2);
-                    switch (randNum)
-                    {
-                        case 0: boss.ChangeState(new GreenState_ClawAttack()); break;
-                        case 1: boss.ChangeState(new GreenState_Breath()); break;
-                    }
+                    boss.ChangeState(new GreenState_ClawAttack());
                 }
                 else if (distance <= boss.attackRange * 3 && distance > boss.attackRange)
                 {
@@ -70,10 +65,11 @@ public class GreenState_Chase : EntityState
             }
             else
             {
-                if (distance <= boss.attackRange)
-                {
-                    boss.ChangeState(new GreenState_Idle());
-                }
+                //if (distance <= boss.attackRange)
+                //{
+                //    boss.ChangeState(new GreenState_Idle());
+                //    Debug.Log("green chase to idle");
+                //}
             }
         }
         if (boss.target == null)

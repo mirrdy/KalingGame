@@ -74,6 +74,10 @@ public class PlayerControl : MonoBehaviourPunCallbacks
             Attack();
             CheckUsePotion();
         }
+        if(GameManager_Phase1.instance.isGameOver)
+        {
+            gameObject.SetActive(false);
+        }
     }
     private void Attack()
     {
@@ -81,29 +85,42 @@ public class PlayerControl : MonoBehaviourPunCallbacks
 
         if (Input.GetMouseButton(0))
         {
-            float attackSpeed = 0.5f;
-            if(actionCool > 1f * attackSpeed)
+            AnimatorStateInfo aniState = animator.GetCurrentAnimatorStateInfo(0);
+            if (aniState.IsName("BasicSlash"))
             {
-                //AudioManager.instance.PlaySFX("PlayerSwordAttack");
-                //animator.SetFloat(animID_AttackSpeed, 0.533f / attackSpeed);
-                animator.SetTrigger(animID_BasicSlash);
-
-                actionCool = 0;
+                if(aniState.normalizedTime >= 1)
+                {
+                    animator.SetTrigger(animID_BasicSlash);
+                }
             }
+            else
+            {
+                animator.SetTrigger(animID_BasicSlash);
+            }
+            //float attackSpeed = 0.5f;
+            //if(actionCool > 1f * attackSpeed)
+            //{
+            //    //AudioManager.instance.PlaySFX("PlayerSwordAttack");
+            //    //animator.SetFloat(animID_AttackSpeed, 0.533f / attackSpeed);
+            //    actionCool = 0;
+            //}
         }
-        if(Input.GetKey(KeyCode.Q))
+        if (Input.GetKey(KeyCode.Q))
         {
-            float attackSpeed = 5f;
+            float attackSpeed = 3f;
             if (actionCool > 1f * attackSpeed)
             {
-                //AudioManager.instance.PlaySFX("PlayerSwordAttack");
-                //animator.SetFloat(animID_AttackSpeed, 0.533f / attackSpeed);
-                animator.SetTrigger(animID_TripleSlash);
+                if (currentMp >= 50)
+                {
+                    SetCurrentMp(currentMp - 50);
+                    //AudioManager.instance.PlaySFX("PlayerSwordAttack");
+                    //animator.SetFloat(animID_AttackSpeed, 0.533f / attackSpeed);
+                    animator.SetTrigger(animID_TripleSlash);
 
-                actionCool = 0;
+                    actionCool = 0;
+                }
             }
         }
-
     }
 
     private void CheckUsePotion()

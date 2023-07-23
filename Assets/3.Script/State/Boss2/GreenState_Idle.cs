@@ -29,7 +29,7 @@ public class GreenState_Idle : EntityState
 
             boss.transform.rotation = targetRotation;
 
-            if (distance <= entity.attackRange && boss.canAttack)
+            if (distance <= entity.attackRange)
             {
                 boss.ChangeState(new GreenState_Chase());
             }

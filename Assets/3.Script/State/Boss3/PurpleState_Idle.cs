@@ -29,15 +29,16 @@ public class PurpleState_Idle : EntityState
 
             boss.transform.rotation = targetRotation;
 
-            if (distance <= entity.attackRange / 2 && boss.canAttack)
+
+            if (distance <= entity.attackRange)
             {
                 boss.ChangeState(new PurpleState_Chase());
             }
-            else if (distance <= entity.attackRange)
+            else if (distance > entity.attackRange && distance <= entity.attackRange*2)
             {
                 boss.ChangeState(new PurpleState_ClawAttack());
             }
-            else if (distance > entity.attackRange)
+            else if (distance > entity.attackRange*2)
             {
                 boss.ChangeState(new PurpleState_ClawAttack());
             }

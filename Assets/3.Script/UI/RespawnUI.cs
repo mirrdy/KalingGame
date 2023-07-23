@@ -29,7 +29,10 @@ public class RespawnUI : MonoBehaviour
     }
     private void OnDisable()
     {
-        myPlayer.Respawn();
+        if (myPlayer != null && !GameManager_Phase1.instance.isGameOver)
+        {
+            myPlayer.Respawn();
+        }
     }
     // Start is called before the first frame update
     void Start()

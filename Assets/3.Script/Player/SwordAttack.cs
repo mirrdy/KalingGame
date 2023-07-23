@@ -9,6 +9,7 @@ public class SwordAttack : MonoBehaviour
     private Transform[] targets; // 타겟 여러명일 때 개체별 타격 쿨타임 적용해야함
     private float attackStartTime;
     private Animator bossAnimator;
+    private bool isReadyAttack;
 
     private const int FRAME_SECOND_ATTACK_START = 46;
     private const int FRAME_THIRD_ATTACK_START = 75;
@@ -23,6 +24,7 @@ public class SwordAttack : MonoBehaviour
         AnimatorStateInfo aniState = bossAnimator.GetCurrentAnimatorStateInfo(0);
         if (!aniState.IsName("TripleSlash"))
         {
+            damage = 5;
             return;
         }
 
@@ -49,10 +51,9 @@ public class SwordAttack : MonoBehaviour
         BossControl boss = other.GetComponentInParent<BossControl>();
         if (boss != null)
         {
-            if (Time.time - attackStartTime > 1f)
+            if (Time.time - attackStartTime > 0.5f)
             {
                 boss.TakeDamage(damage);
-                Debug.Log($"boss take damage:{damage}");
                 attackStartTime = Time.time;
             }
         }

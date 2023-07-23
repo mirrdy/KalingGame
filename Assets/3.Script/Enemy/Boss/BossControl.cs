@@ -2,6 +2,7 @@ using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BossControl : EnemyControl
 {
@@ -12,6 +13,7 @@ public class BossControl : EnemyControl
     private PhotonView PV;
     private int[] viewIDs_LineSpawner;
     public AttackObject[] atkObjects;
+    public Slider healthSlider; // 적의 체력바 Slider UI 요소
 
     private void Awake()
     {
@@ -19,7 +21,9 @@ public class BossControl : EnemyControl
         SetTrigger();
         lineSpawners = new LineSpawner[3];
         TryGetComponent(out PV);
+        healthSlider = GetComponentInChildren<Slider>();
         viewIDs_LineSpawner = new int[lineSpawnerCount];
+
         if (season == Season.Spring)
         {
             currentState = new YellowState_Idle();
@@ -119,10 +123,18 @@ public class BossControl : EnemyControl
     // Update is called once per frame
     protected override void Update()
     {
+        if(isDead)
+        {
+            return;
+        }
         base.Update();
     }
     public override void TakeDamage(int damage)
     {
+        if(isDead)
+        {
+            return;
+        }
         base.TakeDamage(damage);
         PV.RPC("TakeDamage_RPC", RpcTarget.AllBuffered, new object[] { damage });
     }
@@ -142,6 +154,21 @@ public class BossControl : EnemyControl
                 yield return spawnDelay;
             }
         }
+    }
+    private void Die()
+    {
+        Debug.Log($"{season} Boss dies");
+        animator.SetTrigger("Die");
+        isDead = true;
+        StartCoroutine(Destroy_Co());
+    }
+
+    IEnumerator Destroy_Co()
+    {
+        // until AniState가 구조체라 값 형식을 복사해서 쓰기 때문에 WaitUntil 밖에서 캐싱해서 쓰면 현재 State와 동기화가 안됨
+        yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).IsName("Die"));
+        yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
+        Destroy(gameObject);
     }
 
     [PunRPC]
@@ -165,12 +192,17 @@ public class BossControl : EnemyControl
     [PunRPC]
     private void TakeDamage_RPC(int damage)
     {
-        damage -= Mathf.RoundToInt(damage * (1 - def));
+        damage = Mathf.RoundToInt(damage * (1 - def));
+        Debug.Log($"{season} Boss takes {damage}damages");
         currentHp -= damage;
-        if(currentHp <= 0)
+        UpdateHealthBar();
+        if (currentHp <= 0)
         {
-            Debug.Log($"{season} Boss dies");
-            animator.SetTrigger("Die");
+            Die();
         }
+    }
+    void UpdateHealthBar()
+    {
+        healthSlider.value = currentHp / maxHp;
     }
 }

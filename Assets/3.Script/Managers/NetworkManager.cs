@@ -679,7 +679,14 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public bool CheckHereIsThisID(RoomInfo room, string id)
     {
 		Dictionary<int, string> dict_ID = room.CustomProperties[prop_PlayerID] as Dictionary<int, string>;
-
-		return dict_ID.ContainsValue(id);
+		
+		if(dict_ID != null)
+        {
+			return dict_ID.ContainsValue(id);
+		}
+		else
+        {
+			return false;
+        }
 	}
 }

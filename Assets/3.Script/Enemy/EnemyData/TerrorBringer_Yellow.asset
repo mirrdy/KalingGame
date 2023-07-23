@@ -17,7 +17,7 @@ MonoBehaviour:
   def: 0.1
   attackTime: 1
   moveSpeed: 1
-  attackRange: 2
+  attackRange: 4
   attackDelay: 3
   weather: 0
   monsterName: basicBoss

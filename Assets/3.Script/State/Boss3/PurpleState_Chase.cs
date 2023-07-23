@@ -25,56 +25,38 @@ public class PurpleState_Chase : EntityState
             Vector3 direction = targetPosition - entity.transform.position;
             direction.Normalize();
             float distance = Vector3.Distance(boss.transform.position, targetPosition);
-            if (boss.enabled)
-            {
-                boss.transform.position += (boss.moveSpeed * Time.deltaTime * direction);
-            }
+            boss.transform.position += (boss.moveSpeed * Time.deltaTime * direction);
+
             // 몬스터가 플레이어 쪽을 바라보도록 회전 설정
             Vector3 playerDirection = boss.target.position - entity.transform.position;
 
-            playerDirection.y = 0; // Y 축 방향을 무시하여 평면 상의 방향만 고려합니다.
+            //playerDirection.y = 0; // Y 축 방향을 무시하여 평면 상의 방향만 고려합니다.
             Quaternion targetRotation = Quaternion.LookRotation(playerDirection);
             boss.transform.rotation = targetRotation;
 
             if (boss.canAttack)
             {
-                if (distance <= boss.attackRange * 3)
+                if (distance <= boss.attackRange)
                 {
-                    int randNum = Random.Range(0, 2);
-                    switch (randNum)
-                    {
-                        case 0: boss.ChangeState(new PurpleState_ClawAttack()); break;
-                        case 1: boss.ChangeState(new PurpleState_ClawAttack()); break;
-                    }
+                    boss.ChangeState(new PurpleState_BasicAttack());
                 }
                 else if (distance <= boss.attackRange * 3 && distance > boss.attackRange)
                 {
                     boss.ChangeState(new PurpleState_ClawAttack());
                 }
-                else if (distance <= boss.attackRange)
-                {
-                    int randAtk = Random.Range(1, 6);
-                    switch (randAtk)
-                    {
-                        case 1: boss.ChangeState(new PurpleState_ClawAttack()); break;
-                        case 2: boss.ChangeState(new PurpleState_ClawAttack()); break;
-                        case 3: boss.ChangeState(new PurpleState_ClawAttack()); break;
-                        case 4: boss.ChangeState(new PurpleState_ClawAttack()); break;
-                        case 5: boss.ChangeState(new PurpleState_ClawAttack()); break;
-                    }
-                }
-                else if (distance > boss.attackRange)
+                else
                 {
                     boss.ChangeState(new PurpleState_ClawAttack());
                 }
             }
-            else
-            {
-                if (distance <= boss.attackRange)
-                {
-                    boss.ChangeState(new PurpleState_Idle());
-                }
-            }
+            //else
+            //{
+            //    if (distance <= boss.attackRange)
+            //    {
+            //        boss.ChangeState(new PurpleState_Idle());
+            //        Debug.Log("purple chase to idle");
+            //    }
+            //}
         }
         if (boss.target == null)
         {
