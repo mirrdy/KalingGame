@@ -30,7 +30,7 @@ public class YellowState_Chase : EntityState
             // 몬스터가 플레이어 쪽을 바라보도록 회전 설정
             Vector3 playerDirection = boss.target.position - entity.transform.position;
 
-            //playerDirection.y = 0; // Y 축 방향을 무시하여 평면 상의 방향만 고려합니다.
+            playerDirection.y = 0; // Y 축 방향을 무시하여 평면 상의 방향만 고려합니다.
             Quaternion targetRotation = Quaternion.LookRotation(playerDirection);
             boss.transform.rotation = targetRotation;
 

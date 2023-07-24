@@ -12,6 +12,7 @@ public class GameManager_Phase1 : MonoBehaviour
     [SerializeField] private Transform[] bossFields;
     private PhotonView PV;
     [SerializeField] private RectTransform panel_GameOver;
+    [SerializeField] private RectTransform panel_GameClear;
     public bool isGameOver;
 
     private void Awake()
@@ -69,15 +70,28 @@ public class GameManager_Phase1 : MonoBehaviour
         if(NetworkManager.instance.GetSharedLife() <= 0)
         {
             StartCoroutine(GameOver_Co());
-            
+        }
+        if (NetworkManager.instance.GetBossDead(Season.Spring) &&
+            NetworkManager.instance.GetBossDead(Season.Summer) &&
+            NetworkManager.instance.GetBossDead(Season.Autumn))
+        {
+            StartCoroutine(GameClear_Co());
         }
     }
+
     IEnumerator GameOver_Co()
     {
         isGameOver = true;
         panel_GameOver.gameObject.SetActive(true);
         yield return new WaitForSeconds(5f);
         SceneManager.LoadScene("GameOver");
+    }
+    IEnumerator GameClear_Co()
+    {
+        isGameOver = true;
+        panel_GameClear.gameObject.SetActive(true);
+        yield return new WaitForSeconds(5f);
+        SceneManager.LoadScene("GameClear");
     }
 
     [PunRPC]

@@ -34,8 +34,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	public OnUpdateRoom_SharedLife onUpdateRoom_SharedLife;
 	public delegate void OnUpdateRoom_IsCrashed(int index);
 	public OnUpdateRoom_IsCrashed onUpdateRoom_IsCrashed;
+	public delegate void OnUpdateRoom_IsStartedGame();
+	public OnUpdateRoom_IsStartedGame onUpdateRoom_IsStartedGame;
 	public delegate void OnGameOver();
 	public OnGameOver onGameOver;
+	
 
 	private Dictionary<string, RoomInfo> cachedRoomList = new Dictionary<string, RoomInfo>();
 	private List<RoomInfo> list_Room = new List<RoomInfo>();
@@ -49,6 +52,9 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 	private readonly string prop_SharedLife = "sharedLife";
 	private readonly string prop_SeasonGauge = "seasonGauge";
 	private readonly string prop_IsSeasonCrashed = "isSeasonCrashed";
+	private readonly string prop_IsBossDead = "isBossDead";
+	private readonly string prop_IsStartedGame = "isStartedGame";
+	
 
 	private void Awake()
     {
@@ -197,9 +203,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
                     {prop_MasterClientID, new Dictionary<int, string>() },
                     {prop_CanJoin, true },
                     {prop_SharedLife, 1000 },
-					{prop_SeasonGauge, new int[]{ 500, 500, 500 } },
-					{prop_IsSeasonCrashed, new bool[] { false, false, false } }
-				};
+                    {prop_SeasonGauge, new int[]{ 500, 500, 500 } },
+                    {prop_IsSeasonCrashed, new bool[] { false, false, false } },
+                    {prop_IsBossDead, new bool[] { false, false, false} },
+					{prop_IsStartedGame, false }
+                };
 
 		roomOptions.CustomRoomProperties = customProperties;
 
@@ -216,10 +224,11 @@ public class NetworkManager : MonoBehaviourPunCallbacks
             }
         }
 
-		if (roomName.Equals(string.Empty))
-		{
-			roomName = $"room{roomNum}";
-		}
+		//if (roomName.Equals(string.Empty))
+		//{
+		//	roomName = $"room{roomNum}";
+		//}
+		roomName = $"room{roomNum}";
 		PhotonNetwork.JoinOrCreateRoom(roomName, roomOptions, null);
 	}
 
@@ -345,6 +354,12 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 			//Debug.Log($"Custom property with index {prop_IsSeasonCrashed} changed to: {newValue}");
 			onUpdateRoom_IsCrashed?.Invoke(updatedIndex);
 		}
+		if(propertiesThatChanged.ContainsKey(prop_IsStartedGame))
+        {
+			bool newValue = (bool)propertiesThatChanged[prop_IsStartedGame];
+
+			onUpdateRoom_IsStartedGame?.Invoke();
+        }
 	}
 	public void Enqueue_AddSeasonGauge(Season season, int value)
     {
@@ -553,6 +568,32 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 		return isSuccess;
     }
+	public bool GetBossDead(Season season)
+    {
+		Room room = PhotonNetwork.CurrentRoom;
+
+		return ((bool[])room.CustomProperties[prop_IsBossDead])[(int)season];
+	}
+	public void SetBossDead(Season season, bool isDead)
+    {
+		Room room = PhotonNetwork.CurrentRoom;
+
+		int index = (int)season;
+		if (!(room.CustomProperties[prop_IsBossDead] is bool[] prop_BossDead))
+		{
+			return;
+		}
+
+		prop_BossDead[index] = isDead;
+
+		ExitGames.Client.Photon.Hashtable customProperties =
+				new ExitGames.Client.Photon.Hashtable
+				{
+					{prop_IsBossDead, prop_BossDead},
+				};
+
+		room.SetCustomProperties(customProperties);
+	}
 	public override void OnRoomListUpdate(List<RoomInfo> roomList)
 	{
 		UpdateCachedRoomList(roomList);
@@ -569,7 +610,18 @@ public class NetworkManager : MonoBehaviourPunCallbacks
 
 		room.SetCustomProperties(customProperties);
 	}
+	public void StartGameByButton()
+    {
+		Room room = PhotonNetwork.CurrentRoom;
 
+		ExitGames.Client.Photon.Hashtable customProperties =
+				new ExitGames.Client.Photon.Hashtable
+				{
+					{prop_IsStartedGame, false}
+				};
+
+		room.SetCustomProperties(customProperties);
+	}
 	public async void StartBossGame()
     {
 		if (TryGetSelectedBoss(DBManager.instance.info.id, out int selectedBossNum))

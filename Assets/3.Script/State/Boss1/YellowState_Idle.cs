@@ -13,6 +13,35 @@ public class YellowState_Idle : EntityState
 
     public override void UpdateState(LivingEntity entity)
     {
+        if (NetworkManager.instance.CheckThisIsMaster())
+        {
+            Vector3 bossPos = boss.transform.position;
+            float radius = 20f;
+            int layerMask = LayerMask.GetMask("Player");
+
+            Collider[] colliders = Physics.OverlapSphere(bossPos, radius, layerMask);
+
+            if (colliders.Length > 0)
+            {
+                float minDistance = 9999;
+                float distance = 0;
+
+                Collider targetCollider = colliders[0];
+
+                for (int i = 0; i < colliders.Length; i++)
+                {
+                    Collider collider = colliders[i];
+                    distance = Vector3.Distance(boss.transform.position, collider.transform.position);
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        targetCollider = collider;
+                    }
+                }
+                boss.SetTarget(targetCollider.transform);
+            }
+        }
+
         if (boss.target != null)
         {
             Vector3 targetPosition = boss.target.transform.position;
@@ -42,20 +71,7 @@ public class YellowState_Idle : EntityState
                 boss.ChangeState(new YellowState_Chase());
             }
         }
-        else
-        {
-            Vector3 bossPos = boss.transform.position;
-            float radius = 20f;
-            int layerMask = LayerMask.GetMask("Player");
 
-            Collider[] colliders = Physics.OverlapSphere(bossPos, radius, layerMask);
-
-            foreach (Collider collider in colliders)
-            {
-                boss.target = collider.transform;
-                break;
-            }
-        }
     }
     public override void ExitState(LivingEntity entity)
     {

@@ -18,7 +18,7 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     public delegate void WhenPlayerDie();
     public event WhenPlayerDie whenPlayerDie;
 
-    public Vector3 spawnPos { get; private set; }
+    public Vector3 spawnPos;
     private PhotonView PV;
     private Animator animator;
     [SerializeField] private float flowerHitDelay = 3f;
@@ -241,25 +241,37 @@ public class PlayerControl : MonoBehaviourPunCallbacks
     public void Respawn()
     {
         // CharacterController가 transform을 update 할 때 trigger에서 변경한 position을 반영하지 않는 것 같음 - 컨트롤러를 끄고 position 변경 후 다시 킴
-        if (TryGetComponent(out CharacterController control))
-        {
-            Renderer[] renderers = GetComponentsInChildren<Renderer>();
-            foreach (Renderer renderer in renderers)
-            {
-                renderer.enabled = true;
-            }
 
-            control.enabled = true;
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer renderer in renderers)
+        {
+            renderer.enabled = true;
         }
+        SetPosition(spawnPos);
         SetCurrentHp(maxHp);
         SetCurrentMp(maxMp);
-        transform.position = spawnPos;
         isDead = false;
+    }
+    public void SetPosition(Vector3 pos)
+    {
+        PV.RPC("SetPosition_RPC", RpcTarget.AllBuffered, new object[] { pos.x, pos.y, pos.z });
     }
 
     [PunRPC]
 	public void AddSeasonGauge_RPC(Season season, int value)
 	{
         NetworkManager.instance.Enqueue_AddSeasonGauge(season, value);
+    }
+    [PunRPC]
+    public void SetPosition_RPC(float x, float y, float z)
+    {
+        Vector3 pos = new Vector3(x, y, z);
+        if (TryGetComponent(out CharacterController control))
+        {
+            control.enabled = false;
+            transform.position = pos;
+            control.enabled = true;
+        }
+        
     }
 }

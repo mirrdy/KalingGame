@@ -124,8 +124,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e0c820babdcce445b1ba97c3df7d2b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 50
-  weatherPower: 200
+  damage: 40
+  weatherPower: 100
   triggerEnabled: 0
 --- !u!1 &4954353905251649636
 GameObject:
@@ -3389,7 +3389,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e0c820babdcce445b1ba97c3df7d2b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 100
+  damage: 20
   weatherPower: 100
   triggerEnabled: 0
 --- !u!1 &4954353905251891488
@@ -3954,6 +3954,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 2
     Name: isClawAttack
+  - Type: 9
+    SynchronizeType: 2
+    Name: Die
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
@@ -3996,6 +3999,9 @@ MonoBehaviour:
   data_Stat: {fileID: 11400000, guid: c74f4f67657e8664cb435c3939725539, type: 2}
   atkObjects: []
   healthSlider: {fileID: 0}
+  prefab_Portals:
+  - {fileID: 2306436912227741974, guid: 6b073cf5f6652794ab0b8117633c3de9, type: 3}
+  - {fileID: 8463839495154097628, guid: f485ba473bd1ee042ae3c4277135f7c2, type: 3}
 --- !u!54 &-8181486572530838809
 Rigidbody:
   m_ObjectHideFlags: 0

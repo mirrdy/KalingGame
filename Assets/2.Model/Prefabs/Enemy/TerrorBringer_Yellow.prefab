@@ -2766,7 +2766,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters: []
+  m_SynchronizeParameters:
+  - Type: 9
+    SynchronizeType: 0
+    Name: Die
+  - Type: 4
+    SynchronizeType: 2
+    Name: isClawAttack
+  - Type: 4
+    SynchronizeType: 2
+    Name: isWalk
+  - Type: 4
+    SynchronizeType: 2
+    Name: isFlameAttack
+  - Type: 4
+    SynchronizeType: 2
+    Name: isRun
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
@@ -2809,6 +2824,9 @@ MonoBehaviour:
   data_Stat: {fileID: 11400000, guid: 6f26d4eb9a6d5b8428eede982f695699, type: 2}
   atkObjects: []
   healthSlider: {fileID: 0}
+  prefab_Portals:
+  - {fileID: 2306436912227741974, guid: 6b073cf5f6652794ab0b8117633c3de9, type: 3}
+  - {fileID: 950212921835495577, guid: 6359de832c2fde34c869e7e87bad895e, type: 3}
 --- !u!54 &-2514488535376813068
 Rigidbody:
   m_ObjectHideFlags: 0

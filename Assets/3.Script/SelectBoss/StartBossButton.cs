@@ -6,6 +6,6 @@ public class StartBossButton : MonoBehaviour
 {
     public void StartBoss()
     {
-        NetworkManager.instance.StartBossGame();
+        NetworkManager.instance.StartGameByButton();
     }
 }

@@ -50,6 +50,12 @@ MonoBehaviour:
   - Move
   - AddSeasonGauge_RPC
   - TakeDamage_RPC
+  - SetPosition_RPC
+  - StartGameByButton_RPC
+  - SetTriggerDie
+  - SetTarget_RPC
+  - SetTriggerDie_RPC
+  - SetBoolDie_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

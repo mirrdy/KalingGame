@@ -14,6 +14,7 @@ public class BossControl : EnemyControl
     private int[] viewIDs_LineSpawner;
     public AttackObject[] atkObjects;
     public Slider healthSlider; // 적의 체력바 Slider UI 요소
+    [SerializeField] private PortalController[] prefab_Portals;
 
     private void Awake()
     {
@@ -158,8 +159,12 @@ public class BossControl : EnemyControl
     private void Die()
     {
         Debug.Log($"{season} Boss dies");
-        animator.SetTrigger("Die");
+        if(NetworkManager.instance.CheckThisIsMaster())
+        {
+            PV.RPC("SetBoolDie_RPC", RpcTarget.AllBuffered);
+        }
         isDead = true;
+        NetworkManager.instance.SetBossDead(season, true);
         StartCoroutine(Destroy_Co());
     }
 
@@ -167,10 +172,20 @@ public class BossControl : EnemyControl
     {
         // until AniState가 구조체라 값 형식을 복사해서 쓰기 때문에 WaitUntil 밖에서 캐싱해서 쓰면 현재 State와 동기화가 안됨
         yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).IsName("Die"));
+        Instantiate(prefab_Portals[0], transform.parent.position + new Vector3(-10, 3, 0), Quaternion.identity);
+        Instantiate(prefab_Portals[1], transform.parent.position + new Vector3(10, 3, 0), Quaternion.identity);
         yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1);
         Destroy(gameObject);
     }
-
+    public void SetTarget(Transform target)
+    {
+        PV.RPC("SetTarget_RPC", RpcTarget.AllBuffered, target.gameObject.GetPhotonView().ViewID);
+    }
+    [PunRPC]
+    private void SetTarget_RPC(int targetViewID)
+    {
+        target = PhotonView.Find(targetViewID).transform;
+    }
     [PunRPC]
     private void SetTransform(int[] viewIDs)
     {
@@ -205,4 +220,22 @@ public class BossControl : EnemyControl
     {
         healthSlider.value = currentHp / maxHp;
     }
+    [PunRPC]
+    private void SetBoolDie_RPC()
+    {
+        StartCoroutine(StartDie());
+    }
+    IEnumerator StartDie()
+    {
+        animator.SetBool("Die", true);
+        yield return new WaitUntil(() => animator.GetCurrentAnimatorStateInfo(0).IsName("Die"));
+        //yield return new WaitForSeconds(0.5f);
+        animator.SetBool("Die", false);
+    }
+    [PunRPC]
+    private void SetPosition_RPC(float x, float y, float z)
+    {
+
+    }
+    
 }
